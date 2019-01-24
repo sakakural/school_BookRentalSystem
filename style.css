@@ -1,0 +1,36 @@
+table {
+    border: 1px solid black;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+ul {
+    list-style-type: none;
+    display: flex;
+}
+li {
+    margin: 2px;
+    padding: 3px;
+    background-color: rgb(185, 185, 185);
+    border-radius: 5px;
+    cursor: pointer;
+}
+li:hover{
+    background-color: rgb(90, 90, 90);
+    color: white;
+}
+input {
+    width: 10em;
+}
+td.submit {
+    text-align: end;
+}
+.submit input {
+    width: 8em;
+}
+tfoot input {
+    width: auto;
+}
+textarea {
+    width: 90vw;
+    height: 25em;
+}
