@@ -13,7 +13,7 @@ class BookDetail {
          */
         this.status = null;
         /**
-         * @type {Date} 貸出日、nullで未
+         * @type {Date} 貸出日、貸し出してない
          */
         this.date = null;
     }
