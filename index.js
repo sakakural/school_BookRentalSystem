@@ -177,12 +177,13 @@ class DB {
     }
     /**
      * 本の貸し出しを登録します。成功失敗を返します。
+     * @param {Number} isbn ISBNコード
      * @param {Number} serial 本のシリアルコード
      * @param {Number} id 会員番号
      * @returns {Boolean}
      */
-    Rental(serial, id) {
-        var abook = this.searchSerial(serial);
+    Rental(isbn, serial, id) {
+        var abook = this.searchSerial(isbn, serial);
         if (abook && !abook.status) {
             abook.status = id;
             abook.date = Date.now();
@@ -192,12 +193,13 @@ class DB {
     }
     /**
      * 本の返却を登録します。成功失敗を返します。
+     * @param {Number} isbn ISBNコード
      * @param {Number} serial 本のシリアルコード
      * @param {Number} id 会員番号
      * @returns {Boolean}
      */
-    Return(serial, id) {
-        var abook = this.searchSerial(serial);
+    Return(isbn, serial, id) {
+        var abook = this.searchSerial(isbn, serial);
         if (abook && abook.status == id) {
             abook.status = null;
             abook.date = null;
@@ -288,10 +290,11 @@ function Rental() {
      * @type {HTMLFormElement}
      */
     var form = document.forms.rental_returnForm;
+    var isbn = Number(form.isbn.value);
     var serial = Number(form.serial.value);
-    var id = Number(form.serial.iden);
+    var id = Number(form.iden.value);
 
-    if (db.Rental(serial, id)) {
+    if (db.Rental(isbn, serial, id)) {
     } else alert("本の貸し出しに失敗しました");
 }
 function Return() {
@@ -300,10 +303,11 @@ function Return() {
      * @type {HTMLFormElement}
      */
     var form = document.forms.rental_returnForm;
+    var isbn = Number(form.isbn.value);
     var serial = Number(form.serial.value);
-    var id = Number(form.serial.iden);
+    var id = Number(form.iden.value);
 
-    if (db.Return(serial, id)) {
+    if (db.Return(isbn, serial, id)) {
     } else alert("本の返却に失敗しました");
 }
 
@@ -412,4 +416,18 @@ function tabChange(e) {
     document.querySelectorAll("form").forEach(element => {
         element.style.display = "none";
     });
+
+    //テストデータ挿入,データは適当
+    db.books.push(new Book(5784932643,'吾輩は猫である','夏目漱石',new Date('Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)'),0));
+    db.books[db.books.length -1].sub.push(new BookDetail(1))
+    db.books.push(new Book(6243251643,'坊ちゃん','夏目漱石',new Date('Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)'),0));
+    db.books[db.books.length -1].sub.push(new BookDetail(2))
+    db.books.push(new Book(5431903042,'学問のすゝめ','福沢諭吉',new Date('Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)'),0));
+    db.books[db.books.length -1].sub.push(new BookDetail(3))
+    db.persons.push(new Person('鈴木','北海道','080xxxxxxxx','aaaa@example.com'));
+    db.persons[db.persons.length-1].generateID();
+    db.persons.push(new Person('佐藤','青森県','080yyyyyyyy','bbbb@example.com'));
+    db.persons[db.persons.length-1].generateID();
+    db.persons.push(new Person('田中','秋田県','080zzzzzzzz','cccc@example.com'));
+    db.persons[db.persons.length-1].generateID();
 })();
