@@ -326,42 +326,56 @@ function search() {
 function showBooks(database) {
     var table = document.createElement("table");
 
-    table.appendChild(()=>{
+    table.appendChild((() => {
         var thead = document.createElement("thead");
-        thead.appendChild(() => {
+        thead.appendChild((() => {
             var headline = CE("tr");
             Object.keys(database.books[0]).forEach((key) => {
-                headline.appendChild(()=>{
+                headline.appendChild((() => {
                     var column = CE('th');
                     column.innerText = key;
                     return column;
-                });
+                })());
             });
             return headline;
-        });
+        })());
         return thead;
-    });
+    })());
 
-    table.appendChild(()=>{
+    table.appendChild((() => {
         var tbody = document.createElement("tbody");
         database.books.forEach(book => {
-            tbody.appendChild(() => {
+            tbody.appendChild((() => {
                 var record = document.createElement("tr");
-                for (var column of book) {
-                    record.appendChild(() => {
+                Object.keys(book).forEach((key) => {
+                    record.appendChild((() => {
                         var colElement = CE("td");
-                        colElement.innerText = column;
+                        if (key == 'date')
+                            colElement.innerText = getDateString(book[key]);
+                        else
+                            colElement.innerText = book[key];
                         return colElement;
-                    });
-                }
+                    })());
+                });
                 return record;
-            });
+            })());
         });
         return tbody;
-    });
+    })());
 
     QS('.resultArea').innerHTML = '';
     QS('.resultArea').appendChild(table);
+}
+
+/**
+* Dateインスタンスを'YYYY年MM月DD日'形式で返します。
+* @param {Date} date 年月日
+* @returns {String}
+*/
+function getDateString(date) {
+    var result = '';
+    result = `${date.getFullYear()}年${('  ' + (date.getMonth() + 1)).substr(-2)}月${('  ' + date.getDate()).substr(-2)}日`;
+    return result;
 }
 
 function output() {

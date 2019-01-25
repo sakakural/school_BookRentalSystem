@@ -23,6 +23,9 @@ li:hover,li.selected{
 table{
     width: 300px;
 }
+.resultArea table{
+    width: 1000px;
+}
 input {
     width: 10em;
 }
