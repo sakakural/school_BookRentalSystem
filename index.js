@@ -186,7 +186,7 @@ class DB {
         var abook = this.searchSerial(isbn, serial);
         if (abook && !abook.status) {
             abook.status = id;
-            abook.date = Date.now();
+            abook.date = new Date(Date.now());
             return true;
         }
         return false;
@@ -290,7 +290,7 @@ function Rental() {
      * @type {HTMLFormElement}
      */
     var form = document.forms.rental_returnForm;
-    var isbn = Number(form.isbn.value);
+    var isbn = Number(form.ISBN.value);
     var serial = Number(form.serial.value);
     var id = Number(form.iden.value);
 
@@ -303,7 +303,7 @@ function Return() {
      * @type {HTMLFormElement}
      */
     var form = document.forms.rental_returnForm;
-    var isbn = Number(form.isbn.value);
+    var isbn = Number(form.ISBN.value);
     var serial = Number(form.serial.value);
     var id = Number(form.iden.value);
 
