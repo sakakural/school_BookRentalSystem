@@ -314,6 +314,9 @@ function search() {
      */
     var form = document.forms.bookSearchForm;
     var title = form.index.value;
+
+    var result = db.getBooksByTitle(title);
+    showBooks(result);
 }
 
 /**
