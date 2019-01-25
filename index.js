@@ -54,10 +54,9 @@ class Book {
      * @param {Number} id 会員番号
      * @returns {Boolean}
      */
-    isLend(id){
-        for(var detail of this.sub){
-            if(detail.status==id)
-                return true;
+    isLend(id) {
+        for (var detail of this.sub) {
+            if (detail.status == id) return true;
         }
         return false;
     }
@@ -124,9 +123,8 @@ class DB {
          * @type {BookDetail}
          */
         var detail;
-        if (book = this.searchISBN(isbn))
-            if(detail = book.searchSerial(serial))
-                return detail;
+        if ((book = this.searchISBN(isbn)))
+            if ((detail = book.searchSerial(serial))) return detail;
         return null;
     }
     /**
@@ -135,14 +133,13 @@ class DB {
      * @param {String} title 本のタイトルの一部
      * @returns {DB}
      */
-    getBooksByTitle(title){
+    getBooksByTitle(title) {
         /**
          * @type {DB}
          */
         var result = new DB();
-        this.books.forEach((book)=>{
-            if(book.title.includes(title))
-                result.books.push(book);
+        this.books.forEach(book => {
+            if (book.title.includes(title)) result.books.push(book);
         });
         return result;
     }
@@ -152,14 +149,13 @@ class DB {
      * @param {String} actor 本の著者の一部
      * @returns {DB}
      */
-    getBooksByActor(actor){
+    getBooksByActor(actor) {
         /**
          * @type {DB}
          */
         var result = new DB();
-        this.books.forEach((book)=>{
-            if(book.actor.includes(actor))
-                result.books.push(book);
+        this.books.forEach(book => {
+            if (book.actor.includes(actor)) result.books.push(book);
         });
         return result;
     }
@@ -169,14 +165,13 @@ class DB {
      * @param {String} name 名前の一部
      * @returns {DB}
      */
-    getUsersByName(name){
+    getUsersByName(name) {
         /**
          * @type {DB}
          */
         var result = new DB();
-        this.persons.forEach((person)=>{
-            if(person.name.includes(name))
-                result.persons.push(person);
+        this.persons.forEach(person => {
+            if (person.name.includes(name)) result.persons.push(person);
         });
         return result;
     }
@@ -186,9 +181,9 @@ class DB {
      * @param {Number} id 会員番号
      * @returns {Boolean}
      */
-    Rental(serial,id){
+    Rental(serial, id) {
         var abook = this.searchSerial(serial);
-        if(abook&&!abook.status){
+        if (abook && !abook.status) {
             abook.status = id;
             abook.date = Date.now();
             return true;
@@ -201,9 +196,9 @@ class DB {
      * @param {Number} id 会員番号
      * @returns {Boolean}
      */
-    Return(serial,id){
+    Return(serial, id) {
         var abook = this.searchSerial(serial);
-        if(abook&&abook.status==id){
+        if (abook && abook.status == id) {
             abook.status = null;
             abook.date = null;
             return true;
@@ -217,6 +212,12 @@ class DB {
  * @param {string} selector そのままquerySelectorに渡します
  */
 const QS = selector => document.querySelector(selector);
+
+/**
+ * createElementの略です。それだけです。
+ * @param {string} tagName そのままcreateElementに渡します
+ */
+const CE = tagName => document.createElement(tagName);
 
 var db = new DB();
 
@@ -232,7 +233,11 @@ function userRegist() {
     var email = form.email.value;
 
     db.persons.push(new Person(name, address, tel, email));
-    alert(`会員番号は${db.persons[db.persons.length - 1].generateID()}になります。`);
+    alert(
+        `会員番号は${db.persons[
+            db.persons.length - 1
+        ].generateID()}になります。`
+    );
 }
 
 function bookRegist() {
@@ -252,7 +257,7 @@ function bookRegist() {
         db.books.push(new Book(ISBN, title, actor, date, code));
     } else {
         alert(
-            '既に存在するISBNコードです。シリアル番号の追加は下からお願いします。'
+            "既に存在するISBNコードです。シリアル番号の追加は下からお願いします。"
         );
     }
 }
@@ -269,62 +274,93 @@ function serialRegist() {
         var serial = Number(form.serial.value);
         if (!db.searchSerial(ISBN, serial))
             db.searchISBN(ISBN).sub.push(new BookDetail(serial));
-        else alert('どうやら既に存在するシリアルコードのようです。');
+        else alert("どうやら既に存在するシリアルコードのようです。");
     } else {
         alert(
-            '一致するISBNコードが無いようです、書籍データから作ってください。'
+            "一致するISBNコードが無いようです、書籍データから作ってください。"
         );
     }
 }
 
-function Rental(){
+function Rental() {
     /**
      * 貸出情報登録用フォーム
      * @type {HTMLFormElement}
      */
     var form = document.forms.rental_returnForm;
     var serial = Number(form.serial.value);
-    var id = Number(form.serial.iden)
+    var id = Number(form.serial.iden);
 
-    if(db.Rental(serial,id)){}
-    else
-        alert('本の貸し出しに失敗しました')
+    if (db.Rental(serial, id)) {
+    } else alert("本の貸し出しに失敗しました");
 }
-function Return(){
+function Return() {
     /**
      * 貸出情報登録用フォーム
      * @type {HTMLFormElement}
      */
     var form = document.forms.rental_returnForm;
     var serial = Number(form.serial.value);
-    var id = Number(form.serial.iden)
+    var id = Number(form.serial.iden);
 
-    if(db.Return(serial,id)){}
-    else
-        alert('本の返却に失敗しました')
+    if (db.Return(serial, id)) {
+    } else alert("本の返却に失敗しました");
 }
 
-function search(){
+function search() {
     /**
      * 貸出情報登録用フォーム
      * @type {HTMLFormElement}
      */
     var form = document.forms.bookSearchForm;
     var title = form.index.value;
-
 }
 
 /**
- * データベースを表で表示します
+ * データベースの中の本を表で表示します
  * @param {DB} database データベース
  */
-function show(database){
-    
+function showBooks(database) {
+    var table = document.createElement("table");
+
+    table.appendChild(()=>{
+        var thead = document.createElement("thead");
+        thead.appendChild(() => {
+            var headline = CE("tr");
+            Object.keys(database.books[0]).forEach((key) => {
+                headline.appendChild(()=>{
+                    var column = CE('th');
+                    column.innerText = key;
+                    return column;
+                });
+            });
+            return headline;
+        });
+        return thead;
+    });
+
+    table.appendChild(()=>{
+        var tbody = document.createElement("tbody");
+        database.books.forEach(book => {
+            tbody.appendChild(() => {
+                var record = document.createElement("tr");
+                for (var column of book) {
+                    record.appendChild(() => {
+                        var colElement = CE("td");
+                        colElement.innerText = column;
+                        return colElement;
+                    });
+                }
+                return record;
+            });
+        });
+        return tbody;
+    });
 }
 
 function output() {
-    QS('#exportArea').value = JSON.stringify(db, null, '  ');
-    QS('#exportArea').style.display = 'block';
+    QS("#exportArea").value = JSON.stringify(db, null, "  ");
+    QS("#exportArea").style.display = "block";
 }
 
 /**
@@ -337,23 +373,23 @@ function tabChange(e) {
      * @type {Element}
      */
     var target = e.target;
-    document.querySelectorAll('body form').forEach((element) => {
-        if (element.name===target.className+"Form")
-            element.style.display = 'table';
-        else element.style.display = 'none';
+    document.querySelectorAll("body form").forEach(element => {
+        if (element.name === target.className + "Form")
+            element.style.display = "table";
+        else element.style.display = "none";
     });
-    document.querySelectorAll('nav li').forEach((element)=>{
-        if(element.classList.contains('selected'))
-            element.classList.remove('selected');
+    document.querySelectorAll("nav li").forEach(element => {
+        if (element.classList.contains("selected"))
+            element.classList.remove("selected");
     });
-    target.classList.add('selected');
+    target.classList.add("selected");
 }
 
 (() => {
-    document.querySelectorAll('nav li').forEach(element => {
-        element.addEventListener('click', tabChange);
+    document.querySelectorAll("nav li").forEach(element => {
+        element.addEventListener("click", tabChange);
     });
-    document.querySelectorAll('form').forEach((element)=>{
-        element.style.display = 'none';
+    document.querySelectorAll("form").forEach(element => {
+        element.style.display = "none";
     });
 })();
