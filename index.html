@@ -12,157 +12,164 @@
 <body>
     <nav>
         <ul>
-            <li class="bookRegist">書籍情報登録</li>
-            <li class="serialRegist">シリアル登録</li>
+            <li class="bookRegist">書籍情報</li>
             <li class="rental_return">貸出・返却</li>
-            <li class="userRegist">会員登録</li>
+            <li class="userRegist">会員情報</li>
             <li class="bookSearch">書籍検索</li>
         </ul>
     </nav>
-    <form name="bookRegistForm">
-        <table>
+    <section class="bookRegist">
+        <table id="Book">
             <caption>書籍情報登録用フォーム</caption>
-            <tbody>
+            <thead>
                 <tr>
                     <th>ISBN</th>
-                    <td><input type="number" name="ISBN"></td>
-                </tr>
-                <tr>
                     <th>タイトル</th>
-                    <td><input type="text" name="index"></td>
-                </tr>
-                <tr>
                     <th>著者</th>
-                    <td><input type="text" name="actor"></td>
-                </tr>
-                <tr>
                     <th>発行年月日</th>
-                    <td><input type="date" name="date"></td>
-                </tr>
-                <tr>
                     <th>分類コード</th>
-                    <td><input type="number" name="code" max="999" placeholder="0"></td>
                 </tr>
+            </thead>
+            <tbody>
             </tbody>
             <tfoot>
-                <tr>
-                    <td colspan="2" class="submit">
-                        <input type="button" value="登録" onclick="bookRegist()">
-                    </td>
-                </tr>
+                <form name="bookRegistForm">
+                    <tr>
+                        <td><input type="number" name="ISBN"></td>
+                        <td><input type="text" name="index"></td>
+                        <td><input type="text" name="actor"></td>
+                        <td><input type="date" name="date"></td>
+                        <td><input type="number" name="code" max="999" placeholder="0"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="submit">
+                            <input type="button" value="登録" onclick="bookRegist()">
+                        </td>
+                    </tr>
+                </form>
             </tfoot>
         </table>
-    </form>
-    <form name="serialRegistForm">
-        <table>
+        <table id="Detail">
             <caption>シリアル番号登録用フォーム</caption>
-            <tbody>
-                <tr>
-                    <th>ISBN</th>
-                    <td><input type="number" name="ISBN"></td>
-                </tr>
+            <thead>
                 <tr>
                     <th>シリアル</th>
-                    <td><input type="number" name="serial"></td>
                 </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2" class="submit">
-                        <input type="button" value="登録" onclick="serialRegist()">
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </form>
-    <form name="rental_returnForm">
-        <table>
-            <caption>貸出・返却登録用フォーム</caption>
+            </thead>
             <tbody>
-                <tr>
-                    <th>シリアル</th>
-                    <td><input type="number" name="serial"></td>
-                </tr>
-                <tr>
-                    <th>会員番号</th>
-                    <td><input type="numer" name="iden"></td>
-                </tr>
             </tbody>
             <tfoot>
-                <tr>
-                    <td class="submit">
-                        <input type="button" value="貸出" onclick="Rental()">
-                    </td>
-                    <td class="submit">
-                        <input type="button" value="返却" onclick="Return()">
-                    </td>
-                </tr>
+                <form name="serialRegistForm">
+                    <tr>
+                        <td><input type="number" name="serial"></td>
+                    </tr>
+                    <tr>
+                        <td class="submit">
+                            <input type="button" value="登録" onclick="serialRegist()">
+                        </td>
+                    </tr>
+                </form>
             </tfoot>
         </table>
-    </form>
-    <form name="userRegistForm">
-        <table>
+    </section>
+    <section class="rental_return">
+        <form name="rental_returnForm">
+            <table>
+                <caption>貸出・返却登録用フォーム</caption>
+                <tbody>
+                    <tr>
+                        <th>ISBN</th>
+                        <td><input type="number" name="ISBN"></td>
+                    </tr>
+                    <tr>
+                        <th>シリアル</th>
+                        <td><input type="number" name="serial"></td>
+                    </tr>
+                    <tr>
+                        <th>会員番号</th>
+                        <td><input type="numer" name="iden"></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="submit">
+                            <input type="button" value="貸出" onclick="Rental()">
+                        </td>
+                        <td class="submit">
+                            <input type="button" value="返却" onclick="Return()">
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    </section>
+    <section class="userRegist">
+        <table id="Person">
             <caption>会員登録用フォーム</caption>
-            <tbody>
+            <thead>
                 <tr>
                     <th>名前</th>
-                    <td><input type="text" name="Name"></td>
-                </tr>
-                <tr>
                     <th>住所</th>
-                    <td><input type="text" name="address"></td>
-                </tr>
-                <tr>
                     <th>電話番号</th>
-                    <td><input type="text" name="tel"></td>
-                </tr>
-                <tr>
                     <th>メールアドレス</th>
-                    <td><input type="text" name="email"></td>
+                    <th>会員番号</th>
                 </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2" class="submit">
-                        <input type="button" value="会員登録" onclick="userRegist()">
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </form>
-    <form name="bookSearchForm">
-        <table>
-            <caption>本検索用フォーム</caption>
+            </thead>
             <tbody>
-                <tr>
-                    <th>タイトルの一部</th>
-                    <td><input type="text" name="index"></td>
-                </tr>
-                <tr>
-                    <th>作者名の一部</th>
-                    <td><input type="text" id="actor"></td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="radio" name="andor" id="AND_radio" value="AND">
-                        <label for="AND_radio">AND</label> 
-                    </td>
-                    <td>
-                        <input type="radio" name="andor" id="OR_radio" value="OR">
-                        <label for="OR_radio">OR</label> 
-                    </td>
-                </tr>
             </tbody>
             <tfoot>
-                <tr>
-                    <td colspan="2" class="submit">
-                        <input type="button" value="検索" onclick="search()">
-                    </td>
-                </tr>
+                <form name="userRegistForm">
+                    <tr>
+                        <td><input type="text" name="Name"></td>
+                        <td><input type="text" name="address"></td>
+                        <td><input type="text" name="tel"></td>
+                        <td><input type="text" name="email"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="submit">
+                            <input type="button" value="会員登録" onclick="userRegist()">
+                        </td>
+                    </tr>
+                </form>
             </tfoot>
         </table>
-    </form>
-    <div class="resultArea"></div>
+    </section>
+    <section class="bookSearch">
+        <form name="bookSearchForm">
+            <table>
+                <caption>本検索用フォーム</caption>
+                <tbody>
+                    <tr>
+                        <th>タイトルの一部</th>
+                        <td><input type="text" name="index"></td>
+                    </tr>
+                    <tr>
+                        <th>作者名の一部</th>
+                        <td><input type="text" id="actor"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="radio" name="andor" id="AND_radio" value="AND">
+                            <label for="AND_radio">AND</label>
+                        </td>
+                        <td>
+                            <input type="radio" name="andor" id="OR_radio" value="OR">
+                            <label for="OR_radio">OR</label>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="submit">
+                            <input type="button" value="検索" onclick="search()">
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+        <div class="resultArea"></div>
+    </section>
     <input type="button" value="出力" onclick="output()"><br>
     <textarea id="exportArea" readonly style="display:none;"></textarea>
     <script src="./index.js"></script>

@@ -264,16 +264,14 @@ function bookRegist() {
     }
 }
 
+/**
+ * ISBNから本を特定してシリアル番号登録します
+ */
 function serialRegist() {
-    /**
-     * シリアル番号登録用フォーム
-     * @type {HTMLFormElement}
-     */
-    var form = document.forms.serialRegistForm;
-    var ISBN = Number(form.ISBN.value);
+    var ISBN = Number(document.forms.bookRegistForm.ISBN.value);
 
     if (db.searchISBN(ISBN)) {
-        var serial = Number(form.serial.value);
+        var serial = Number(document.forms.serialRegistForm.serial.value);
         if (!db.searchSerial(ISBN, serial))
             db.searchISBN(ISBN).sub.push(new BookDetail(serial));
         else alert("どうやら既に存在するシリアルコードのようです。");
@@ -330,28 +328,25 @@ function search() {
 function showBooks(database) {
     var table = document.createElement("table");
 
-    table.appendChild((() => {
-        var thead = document.createElement("thead");
-        thead.appendChild((() => {
-            var headline = CE("tr");
-            Object.keys(database.books[0]).forEach((key) => {
-                headline.appendChild((() => {
-                    var column = CE('th');
-                    column.innerText = key;
-                    return column;
-                })());
-            });
-            return headline;
-        })());
-        return thead;
-    })());
+    table.appendChild(createHeadline(database));
+    table.appendChild(listBookRecoads(database));
 
-    table.appendChild((() => {
-        var tbody = document.createElement("tbody");
-        database.books.forEach(book => {
-            tbody.appendChild((() => {
-                var record = document.createElement("tr");
-                Object.keys(book).forEach((key) => {
+    QS('.resultArea').innerHTML = '';
+    QS('.resultArea').appendChild(table);
+}
+
+/**
+ * 書籍リストをtbodyで書きだします。適当なtableに突っ込んでください。
+ * @param {DB} database データベース
+ * @returns {HTMLTableSectionElement}
+ */
+function listBookRecoads(database) {
+    var tbody = document.createElement("tbody");
+    database.books.forEach(book => {
+        tbody.appendChild((() => {
+            var record = document.createElement("tr");
+            Object.keys(book).forEach((key) => {
+                if (key != 'sub')
                     record.appendChild((() => {
                         var colElement = CE("td");
                         if (key == 'date')
@@ -360,15 +355,56 @@ function showBooks(database) {
                             colElement.innerText = book[key];
                         return colElement;
                     })());
-                });
-                return record;
-            })());
-        });
-        return tbody;
-    })());
+            });
+            return record;
+        })());
+    });
+    return tbody;
+}
 
-    QS('.resultArea').innerHTML = '';
-    QS('.resultArea').appendChild(table);
+/**
+ * 会員リストをtbodyで書きだします。適当なtableに突っ込んでください。
+ * @param {DB} database データベース
+ * @returns {HTMLTableSectionElement}
+ */
+function listPersonRecoads(database) {
+    var tbody = document.createElement("tbody");
+    database.persons.forEach(book => {
+        tbody.appendChild((() => {
+            var record = document.createElement("tr");
+            Object.keys(book).forEach((key) => {
+                record.appendChild((() => {
+                    var colElement = CE("td");
+                    colElement.innerText = book[key];
+                    return colElement;
+                })());
+            });
+            return record;
+        })());
+    });
+    return tbody;
+}
+
+/**
+ * 書籍リスト用の見出しを作成します。theadで返します。
+ * @param {DB} database データベース
+ * @returns {HTMLTableSectionElement}
+ */
+function createHeadline(database) {
+    var thead = document.createElement("thead");
+    thead.appendChild((() => {
+        var headline = CE("tr");
+        Object.keys(database.books[0]).forEach((key) => {
+            if (key != 'sub')
+                headline.appendChild((() => {
+                    var column = CE('th');
+                    column.innerText = key;
+                    return column;
+                })());
+        });
+        return headline;
+    })());
+    return thead;
 }
 
 /**
@@ -397,9 +433,9 @@ function tabChange(e) {
      * @type {Element}
      */
     var target = e.target;
-    document.querySelectorAll("body form").forEach(element => {
-        if (element.name === target.className + "Form")
-            element.style.display = "table";
+    document.querySelectorAll("section").forEach(element => {
+        if (element.className === target.className)
+            element.style.display = "block";
         else element.style.display = "none";
     });
     document.querySelectorAll("nav li").forEach(element => {
@@ -409,25 +445,37 @@ function tabChange(e) {
     target.classList.add("selected");
 }
 
+function viewBookList() {
+    QS('#Book tbody').replaceWith(listBookRecoads(db));
+}
+
+function viewPersonList() {
+    QS('#Person tbody').replaceWith(listPersonRecoads(db));
+}
+
 (() => {
     document.querySelectorAll("nav li").forEach(element => {
         element.addEventListener("click", tabChange);
     });
-    document.querySelectorAll("form").forEach(element => {
+    document.querySelectorAll("section").forEach(element => {
         element.style.display = "none";
     });
+    QS('li.bookRegist').addEventListener('click', viewBookList);
+    QS('#Book input[type="button"]').addEventListener('click', viewBookList);
+    QS('li.userRegist').addEventListener('click', viewPersonList);
+    QS('#Person input[type="button"]').addEventListener('click', viewPersonList);
 
     //テストデータ挿入,データは適当
-    db.books.push(new Book(5784932643,'吾輩は猫である','夏目漱石',new Date('Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)'),0));
-    db.books[db.books.length -1].sub.push(new BookDetail(1))
-    db.books.push(new Book(6243251643,'坊ちゃん','夏目漱石',new Date('Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)'),0));
-    db.books[db.books.length -1].sub.push(new BookDetail(2))
-    db.books.push(new Book(5431903042,'学問のすゝめ','福沢諭吉',new Date('Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)'),0));
-    db.books[db.books.length -1].sub.push(new BookDetail(3))
-    db.persons.push(new Person('鈴木','北海道','080xxxxxxxx','aaaa@example.com'));
-    db.persons[db.persons.length-1].generateID();
-    db.persons.push(new Person('佐藤','青森県','080yyyyyyyy','bbbb@example.com'));
-    db.persons[db.persons.length-1].generateID();
-    db.persons.push(new Person('田中','秋田県','080zzzzzzzz','cccc@example.com'));
-    db.persons[db.persons.length-1].generateID();
+    db.books.push(new Book(5784932643, '吾輩は猫である', '夏目漱石', new Date('Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
+    db.books[db.books.length - 1].sub.push(new BookDetail(1))
+    db.books.push(new Book(6243251643, '坊ちゃん', '夏目漱石', new Date('Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
+    db.books[db.books.length - 1].sub.push(new BookDetail(2))
+    db.books.push(new Book(5431903042, '学問のすゝめ', '福沢諭吉', new Date('Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
+    db.books[db.books.length - 1].sub.push(new BookDetail(3))
+    db.persons.push(new Person('鈴木', '北海道', '080xxxxxxxx', 'aaaa@example.com'));
+    db.persons[db.persons.length - 1].generateID();
+    db.persons.push(new Person('佐藤', '青森県', '080yyyyyyyy', 'bbbb@example.com'));
+    db.persons[db.persons.length - 1].generateID();
+    db.persons.push(new Person('田中', '秋田県', '080zzzzzzzz', 'cccc@example.com'));
+    db.persons[db.persons.length - 1].generateID();
 })();

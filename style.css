@@ -21,13 +21,13 @@ li:hover,li.selected{
     color: white;
 }
 table{
-    width: 300px;
+    /*width: 300px;*/
 }
 .resultArea table{
     width: 1000px;
 }
 input {
-    width: 10em;
+    width: auto;
 }
 input[type="radio"]{
     width: 10px;
@@ -39,7 +39,7 @@ td.submit {
     text-align: end;
 }
 .submit input {
-    width: 8em;
+    width: auto;
 }
 tfoot input {
     width: auto;
