@@ -4,6 +4,8 @@ table {
     border-collapse: collapse;
 }
 ul {
+    padding: 0px;
+    margin: 0px;
     list-style-type: none;
     display: flex;
 }
@@ -14,12 +16,21 @@ li {
     border-radius: 5px;
     cursor: pointer;
 }
-li:hover{
+li:hover,li.selected{
     background-color: rgb(90, 90, 90);
     color: white;
 }
+table{
+    width: 300px;
+}
 input {
     width: 10em;
+}
+input[type="radio"]{
+    width: 10px;
+}
+td{
+    text-align: center;
 }
 td.submit {
     text-align: end;

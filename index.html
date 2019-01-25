@@ -16,7 +16,7 @@
             <li class="serialRegist">シリアル登録</li>
             <li class="rental_return">貸出・返却</li>
             <li class="userRegist">会員登録</li>
-            <li class="bookSearch"></li>
+            <li class="bookSearch">書籍検索</li>
         </ul>
     </nav>
     <form name="bookRegistForm">
@@ -142,6 +142,16 @@
                     <th>作者名の一部</th>
                     <td><input type="text" id="actor"></td>
                 </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="andor" id="AND_radio" value="AND">
+                        <label for="AND_radio">AND</label> 
+                    </td>
+                    <td>
+                        <input type="radio" name="andor" id="OR_radio" value="OR">
+                        <label for="OR_radio">OR</label> 
+                    </td>
+                </tr>
             </tbody>
             <tfoot>
                 <tr>
@@ -154,7 +164,7 @@
     </form>
     <div class="resultArea"></div>
     <input type="button" value="出力" onclick="output()"><br>
-    <textarea id="exportArea" readonly></textarea>
+    <textarea id="exportArea" readonly style="display:none;"></textarea>
     <script src="./index.js"></script>
 </body>
 

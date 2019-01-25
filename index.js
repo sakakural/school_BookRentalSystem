@@ -130,6 +130,57 @@ class DB {
         return null;
     }
     /**
+     * 本のタイトルから本を検索します
+     * 返り値はデータベースです。
+     * @param {String} title 本のタイトルの一部
+     * @returns {DB}
+     */
+    getBooksByTitle(title){
+        /**
+         * @type {DB}
+         */
+        var result = new DB();
+        this.books.forEach((book)=>{
+            if(book.title.includes(title))
+                result.books.push(book);
+        });
+        return result;
+    }
+    /**
+     * 本の著者から本を検索します
+     * 返り値はデータベースです。
+     * @param {String} actor 本の著者の一部
+     * @returns {DB}
+     */
+    getBooksByActor(actor){
+        /**
+         * @type {DB}
+         */
+        var result = new DB();
+        this.books.forEach((book)=>{
+            if(book.actor.includes(actor))
+                result.books.push(book);
+        });
+        return result;
+    }
+    /**
+     * 名前の一部から利用者を検索します。
+     * 返り値はデータベースです。
+     * @param {String} name 名前の一部
+     * @returns {DB}
+     */
+    getUsersByName(name){
+        /**
+         * @type {DB}
+         */
+        var result = new DB();
+        this.persons.forEach((person)=>{
+            if(person.name.includes(name))
+                result.persons.push(person);
+        });
+        return result;
+    }
+    /**
      * 本の貸し出しを登録します。成功失敗を返します。
      * @param {Number} serial 本のシリアルコード
      * @param {Number} id 会員番号
@@ -253,8 +304,27 @@ function Return(){
         alert('本の返却に失敗しました')
 }
 
+function search(){
+    /**
+     * 貸出情報登録用フォーム
+     * @type {HTMLFormElement}
+     */
+    var form = document.forms.bookSearchForm;
+    var title = form.index.value;
+
+}
+
+/**
+ * データベースを表で表示します
+ * @param {DB} database データベース
+ */
+function show(database){
+    
+}
+
 function output() {
     QS('#exportArea').value = JSON.stringify(db, null, '  ');
+    QS('#exportArea').style.display = 'block';
 }
 
 /**
@@ -272,6 +342,11 @@ function tabChange(e) {
             element.style.display = 'table';
         else element.style.display = 'none';
     });
+    document.querySelectorAll('nav li').forEach((element)=>{
+        if(element.classList.contains('selected'))
+            element.classList.remove('selected');
+    });
+    target.classList.add('selected');
 }
 
 (() => {
