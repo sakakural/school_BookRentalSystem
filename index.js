@@ -359,6 +359,9 @@ function showBooks(database) {
         });
         return tbody;
     });
+
+    QS('.resultArea').innerHTML = '';
+    QS('.resultArea').appendChild(table);
 }
 
 function output() {
