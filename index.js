@@ -176,6 +176,18 @@ class DB {
         return result;
     }
     /**
+     * 会員番号から会員を返します。無しはnullです。
+     * @param {Number} id 会員番号
+     * @returns {Person}
+     */
+    getUserByID(id) {
+        this.persons.forEach((person) => {
+            if (person.id == id)
+                return person;
+        });
+        return null;
+    }
+    /**
      * 本の貸し出しを登録します。成功失敗を返します。
      * @param {Number} isbn ISBNコード
      * @param {Number} serial 本のシリアルコード
@@ -236,10 +248,17 @@ function userRegist() {
 
     db.persons.push(new Person(name, address, tel, email));
     alert(
-        `会員番号は${db.persons[
-            db.persons.length - 1
-        ].generateID()}になります。`
+        `会員番号は${generateID()}になります。`
     );
+
+    /**
+     * db.personsの配列の最後のPersonにIDを生成します。被りは起こしません。
+     */
+    function generateID() {
+        var person = db.persons[db.persons.length - 1];
+        while (!(db.getUserByID(person.generateID())));
+        return person.id;
+    }
 }
 
 function bookRegist() {
@@ -445,10 +464,15 @@ function tabChange(e) {
     target.classList.add("selected");
 }
 
+/**
+ * 書籍情報のテーブルのtbodyに書籍リストをセットします。
+ */
 function viewBookList() {
     QS('#Book tbody').replaceWith(listBookRecoads(db));
 }
-
+/**
+ * 会員情報のテーブルのtbodyに会員リストをセットします。
+ */
 function viewPersonList() {
     QS('#Person tbody').replaceWith(listPersonRecoads(db));
 }
@@ -460,10 +484,6 @@ function viewPersonList() {
     document.querySelectorAll("section").forEach(element => {
         element.style.display = "none";
     });
-    QS('li.bookRegist').addEventListener('click', viewBookList);
-    QS('#Book input[type="button"]').addEventListener('click', viewBookList);
-    QS('li.userRegist').addEventListener('click', viewPersonList);
-    QS('#Person input[type="button"]').addEventListener('click', viewPersonList);
 
     //テストデータ挿入,データは適当
     db.books.push(new Book(5784932643, '吾輩は猫である', '夏目漱石', new Date('Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
@@ -478,4 +498,32 @@ function viewPersonList() {
     db.persons[db.persons.length - 1].generateID();
     db.persons.push(new Person('田中', '秋田県', '080zzzzzzzz', 'cccc@example.com'));
     db.persons[db.persons.length - 1].generateID();
+})();
+
+//書籍情報登録フォーム用
+(() => {
+    QS('li.bookRegist').addEventListener('click', viewBookList);
+    QS('#Book input[value="登録"]').addEventListener('click', viewBookList);
+    QS('#bookRegistButton').addEventListener('click', registButtonClick);
+    function registButtonClick(e) {
+        if (!e) e = event;
+        e.target.style.display = 'none';
+        document.querySelectorAll('#Book .bookRegistForm').forEach((trow) => {
+            trow.style.display = 'table-row';
+        });
+    }
+})();
+
+//会員情報登録フォーム用
+(() => {
+    QS('li.userRegist').addEventListener('click', viewPersonList);
+    QS('#Person input[type="button"]').addEventListener('click', viewPersonList);
+    QS('#userRegistButton').addEventListener('click', registButtonClick);
+    function registButtonClick(e) {
+        if (!e) e = event;
+        e.target.style.display = 'none';
+        document.querySelectorAll('#Person .userRegistForm').forEach((trow) => {
+            trow.style.display = 'table-row';
+        });
+    }
 })();

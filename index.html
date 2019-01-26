@@ -20,7 +20,7 @@
     </nav>
     <section class="bookRegist">
         <table id="Book">
-            <caption>書籍情報登録用フォーム</caption>
+            <caption>書籍情報参照</caption>
             <thead>
                 <tr>
                     <th>ISBN</th>
@@ -33,15 +33,20 @@
             <tbody>
             </tbody>
             <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <input type="button" value="書籍登録" id="bookRegistButton">
+                    </td>
+                </tr>
                 <form name="bookRegistForm">
-                    <tr>
+                    <tr style="display:none;" class="bookRegistForm">
                         <td><input type="number" name="ISBN"></td>
                         <td><input type="text" name="index"></td>
                         <td><input type="text" name="actor"></td>
                         <td><input type="date" name="date"></td>
                         <td><input type="number" name="code" max="999" placeholder="0"></td>
                     </tr>
-                    <tr>
+                    <tr style="display:none;" class="bookRegistForm">
                         <td colspan="5" class="submit">
                             <input type="button" value="登録" onclick="bookRegist()">
                         </td>
@@ -50,10 +55,12 @@
             </tfoot>
         </table>
         <table id="Detail">
-            <caption>シリアル番号登録用フォーム</caption>
+            <caption>ユニーク書籍</caption>
             <thead>
                 <tr>
                     <th>シリアル</th>
+                    <th>借主</th>
+                    <th>貸出日</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,11 +69,10 @@
                 <form name="serialRegistForm">
                     <tr>
                         <td><input type="number" name="serial"></td>
-                    </tr>
-                    <tr>
                         <td class="submit">
                             <input type="button" value="登録" onclick="serialRegist()">
                         </td>
+                        <td></td>
                     </tr>
                 </form>
             </tfoot>
@@ -78,6 +84,10 @@
                 <caption>貸出・返却登録用フォーム</caption>
                 <tbody>
                     <tr>
+                        <th>会員番号</th>
+                        <td><input type="numer" name="iden"></td>
+                    </tr>
+                    <tr>
                         <th>ISBN</th>
                         <td><input type="number" name="ISBN"></td>
                     </tr>
@@ -85,17 +95,13 @@
                         <th>シリアル</th>
                         <td><input type="number" name="serial"></td>
                     </tr>
-                    <tr>
-                        <th>会員番号</th>
-                        <td><input type="numer" name="iden"></td>
-                    </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td class="submit">
-                            <input type="button" value="貸出" onclick="Rental()">
+                        <td>
                         </td>
                         <td class="submit">
+                            <input type="button" value="貸出" onclick="Rental()">
                             <input type="button" value="返却" onclick="Return()">
                         </td>
                     </tr>
@@ -118,15 +124,20 @@
             <tbody>
             </tbody>
             <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <input type="button" value="会員登録" id="userRegistButton">
+                    </td>
+                </tr>
                 <form name="userRegistForm">
-                    <tr>
+                    <tr style="display:none;" class="userRegistForm">
                         <td><input type="text" name="Name"></td>
                         <td><input type="text" name="address"></td>
                         <td><input type="text" name="tel"></td>
                         <td><input type="text" name="email"></td>
                         <td></td>
                     </tr>
-                    <tr>
+                    <tr style="display:none;" class="userRegistForm">
                         <td colspan="5" class="submit">
                             <input type="button" value="会員登録" onclick="userRegist()">
                         </td>

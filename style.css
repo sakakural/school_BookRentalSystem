@@ -21,7 +21,7 @@ li:hover,li.selected{
     color: white;
 }
 table{
-    /*width: 300px;*/
+    width: auto;
 }
 .resultArea table{
     width: 1000px;
@@ -42,7 +42,7 @@ td.submit {
     width: auto;
 }
 tfoot input {
-    width: auto;
+    width: 120px;
 }
 textarea {
     width: 90vw;
