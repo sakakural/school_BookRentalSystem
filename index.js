@@ -247,16 +247,17 @@ function userRegist() {
     var email = form.email.value;
 
     db.persons.push(new Person(name, address, tel, email));
-    alert(
-        `会員番号は${generateID()}になります。`
-    );
+    //alert(
+    //    `会員番号は${generateID()}になります。`
+    //);
+    generateID();
 
     /**
      * db.personsの配列の最後のPersonにIDを生成します。被りは起こしません。
      */
     function generateID() {
         var person = db.persons[db.persons.length - 1];
-        while (!(db.getUserByID(person.generateID())));
+        while (db.getUserByID(person.generateID()));
         return person.id;
     }
 }
@@ -469,7 +470,47 @@ function tabChange(e) {
  */
 function viewBookList() {
     QS('#Book tbody').replaceWith(listBookRecoads(db));
+    document.querySelectorAll('#Book tbody tr').forEach((row)=>{
+        row.addEventListener('click',(e)=>{
+            try{
+                QS('#Book tbody tr.selected').classList.remove('selected');
+            }catch{}
+            if(!e) e=event;
+            var target = e.target;
+            while(target.tagName!='TR'){
+                target = target.parentElement;
+            }
+            target.classList.add('selected');
+            QS('#Detail tbody').replaceWith(
+                viewBookDetail(
+                    db.searchISBN(Number(target.querySelector('td').innerText))
+                )
+            );
+        });
+    });
 }
+
+/**
+ * 書籍詳細情報をtbodyで書きだします。適当なtableに突っ込んでください。
+ * @param {Book} book 書籍情報
+ * @returns {HTMLTableSectionElement}
+ */
+function viewBookDetail(book){
+    var tbody = CE('tbody');
+    book.sub.forEach((detail)=>{
+        var record = CE('tr');
+        Object.keys(detail).forEach((key)=>{
+            record.appendChild((()=>{
+                var col = CE('td');
+                col.innerText = detail[key];
+                return col;
+            })());
+        });
+        return record;
+    });
+    return tbody;
+}
+
 /**
  * 会員情報のテーブルのtbodyに会員リストをセットします。
  */
@@ -517,7 +558,7 @@ function viewPersonList() {
 //会員情報登録フォーム用
 (() => {
     QS('li.userRegist').addEventListener('click', viewPersonList);
-    QS('#Person input[type="button"]').addEventListener('click', viewPersonList);
+    QS('#Person input[value="登録"]').addEventListener('click', viewPersonList);
     QS('#userRegistButton').addEventListener('click', registButtonClick);
     function registButtonClick(e) {
         if (!e) e = event;
