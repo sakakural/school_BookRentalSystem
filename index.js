@@ -376,6 +376,7 @@ function listBookRecoads(database) {
                         return colElement;
                     })());
             });
+            record.book = book;
             return record;
         })());
     });
@@ -389,16 +390,17 @@ function listBookRecoads(database) {
  */
 function listPersonRecoads(database) {
     var tbody = document.createElement("tbody");
-    database.persons.forEach(book => {
+    database.persons.forEach(person => {
         tbody.appendChild((() => {
             var record = document.createElement("tr");
-            Object.keys(book).forEach((key) => {
+            Object.keys(person).forEach((key) => {
                 record.appendChild((() => {
                     var colElement = CE("td");
-                    colElement.innerText = book[key];
+                    colElement.innerText = person[key];
                     return colElement;
                 })());
             });
+            record.person = person;
             return record;
         })());
     });
@@ -481,11 +483,7 @@ function viewBookList() {
                 target = target.parentElement;
             }
             target.classList.add('selected');
-            QS('#Detail tbody').replaceWith(
-                viewBookDetail(
-                    db.searchISBN(Number(target.querySelector('td').innerText))
-                )
-            );
+            QS('#Detail tbody').replaceWith(viewBookDetail(target.book));
         });
     });
 }
@@ -500,13 +498,11 @@ function viewBookDetail(book){
     book.sub.forEach((detail)=>{
         var record = CE('tr');
         Object.keys(detail).forEach((key)=>{
-            record.appendChild((()=>{
-                var col = CE('td');
-                col.innerText = detail[key];
-                return col;
-            })());
+            var col = CE('td');
+            col.innerText = detail[key];
+            record.appendChild(col);
         });
-        return record;
+        tbody.appendChild(record);
     });
     return tbody;
 }
