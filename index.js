@@ -438,7 +438,7 @@ function createHeadline(database) {
 */
 function getDateString(date) {
     var result = '';
-    if(date)
+    if (date)
         result = `${date.getFullYear()}年${('  ' + (date.getMonth() + 1)).substr(-2)}月${('  ' + date.getDate()).substr(-2)}日`;
     return result;
 }
@@ -475,14 +475,14 @@ function tabChange(e) {
  */
 function viewBookList() {
     QS('#Book tbody').replaceWith(listBookRecoads(db));
-    document.querySelectorAll('#Book tbody tr').forEach((row)=>{
-        row.addEventListener('click',(e)=>{
-            try{
+    document.querySelectorAll('#Book tbody tr').forEach((row) => {
+        row.addEventListener('click', (e) => {
+            try {
                 QS('#Book tbody tr.selected').classList.remove('selected');
-            }catch{}
-            if(!e) e=event;
+            } catch{ }
+            if (!e) e = event;
             var target = e.target;
-            while(target.tagName!='TR'){
+            while (target.tagName != 'TR') {
                 target = target.parentElement;
             }
             target.classList.add('selected');
@@ -496,13 +496,13 @@ function viewBookList() {
  * @param {Book} book 書籍情報
  * @returns {HTMLTableSectionElement}
  */
-function viewBookDetail(book){
+function viewBookDetail(book) {
     var tbody = CE('tbody');
-    book.sub.forEach((detail)=>{
+    book.sub.forEach((detail) => {
         var record = CE('tr');
-        Object.keys(detail).forEach((key)=>{
+        Object.keys(detail).forEach((key) => {
             var col = CE('td');
-            if(key=='date')
+            if (key == 'date')
                 col.innerText = getDateString(detail[key]);
             else
                 col.innerText = detail[key];
@@ -547,13 +547,22 @@ function viewPersonList() {
 (() => {
     QS('li.bookRegist').addEventListener('click', viewBookList);
     QS('#Book input[value="登録"]').addEventListener('click', viewBookList);
-    QS('#bookRegistButton').addEventListener('click', registButtonClick);
+    QS('#bookRegistShow').addEventListener('click', registButtonClick);
+    var toggle = false;
     function registButtonClick(e) {
         if (!e) e = event;
-        e.target.style.display = 'none';
-        document.querySelectorAll('#Book .bookRegistForm').forEach((trow) => {
-            trow.style.display = 'table-row';
-        });
+        if (!toggle) {
+            e.target.classList.add('showed');
+            document.querySelectorAll('#Book .bookRegistForm').forEach((trow) => {
+                trow.style.display = 'table-row';
+            });
+        }else{
+            e.target.classList.remove('showed');
+            document.querySelectorAll('#Book .bookRegistForm').forEach((trow) => {
+                trow.style.display = 'none';
+            });
+        }
+        toggle = !toggle;
     }
 })();
 
@@ -561,12 +570,21 @@ function viewPersonList() {
 (() => {
     QS('li.userRegist').addEventListener('click', viewPersonList);
     QS('#Person input[value="登録"]').addEventListener('click', viewPersonList);
-    QS('#userRegistButton').addEventListener('click', registButtonClick);
+    QS('#userRegistShow').addEventListener('click', registButtonClick);
+    var toggle = false;
     function registButtonClick(e) {
         if (!e) e = event;
-        e.target.style.display = 'none';
+        if (!toggle) {
+        e.target.classList.add('showed');
         document.querySelectorAll('#Person .userRegistForm').forEach((trow) => {
             trow.style.display = 'table-row';
         });
+        }else{
+            e.target.classList.remove('showed');
+            document.querySelectorAll('#Person .userRegistForm').forEach((trow) => {
+                trow.style.display = 'none';
+            });
+        }
+        toggle = !toggle;
     }
 })();
