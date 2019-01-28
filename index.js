@@ -77,7 +77,7 @@ class Person {
         this.id = null;
     }
     /**
-     * 会員番号を生成します。
+     * 会員番号を生成します。被ります。適当に判定してください。
      * @returns {Number}
      */
     generateID() {
@@ -288,7 +288,7 @@ function bookRegist() {
  * ISBNから本を特定してシリアル番号登録します
  */
 function serialRegist() {
-    var ISBN = Number(document.forms.bookRegistForm.ISBN.value);
+    var ISBN = QS('#Book tr.selected').book.isbn;
 
     if (db.searchISBN(ISBN)) {
         var serial = Number(document.forms.serialRegistForm.serial.value);
@@ -300,6 +300,7 @@ function serialRegist() {
             "一致するISBNコードが無いようです、書籍データから作ってください。"
         );
     }
+    QS('#Book .selected').be
 }
 
 function Rental() {
@@ -315,6 +316,7 @@ function Rental() {
     if (db.Rental(isbn, serial, id)) {
     } else alert("本の貸し出しに失敗しました");
 }
+
 function Return() {
     /**
      * 貸出情報登録用フォーム
@@ -436,7 +438,8 @@ function createHeadline(database) {
 */
 function getDateString(date) {
     var result = '';
-    result = `${date.getFullYear()}年${('  ' + (date.getMonth() + 1)).substr(-2)}月${('  ' + date.getDate()).substr(-2)}日`;
+    if(date)
+        result = `${date.getFullYear()}年${('  ' + (date.getMonth() + 1)).substr(-2)}月${('  ' + date.getDate()).substr(-2)}日`;
     return result;
 }
 
@@ -499,7 +502,10 @@ function viewBookDetail(book){
         var record = CE('tr');
         Object.keys(detail).forEach((key)=>{
             var col = CE('td');
-            col.innerText = detail[key];
+            if(key=='date')
+                col.innerText = getDateString(detail[key]);
+            else
+                col.innerText = detail[key];
             record.appendChild(col);
         });
         tbody.appendChild(record);
