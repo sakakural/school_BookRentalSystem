@@ -104,9 +104,24 @@ class DB {
      * @param {Number} isbn ISBNコード
      * @returns {Book} 書籍情報、またはnull
      */
-    searchISBN(isbn) {
-        for (let Book of this.books) if (Book.isbn === isbn) return Book;
-        return null;
+    getBookByISBN(isbn) {
+        var result = null;
+        this.books.forEach(book => {
+            if (book.isbn === isbn) result = book;
+        });
+        return result;
+    }
+    /**
+     * ISBNから書籍のインデックスを検索します。なければnullを返します。
+     * @param {Number} isbn ISBNコード
+     * @returns {Number}
+     */
+    getBookIdxByISBN(isbn) {
+        var result = null;
+        this.books.forEach((book, index) => {
+            if (book.isbn === isbn) result = index;
+        });
+        return result;
     }
     /**
      * シリアルコードが存在すればそれのBookDetailを返します。
@@ -123,7 +138,7 @@ class DB {
          * @type {BookDetail}
          */
         var detail;
-        if ((book = this.searchISBN(isbn)))
+        if ((book = this.getBookByISBN(isbn)))
             if ((detail = book.searchSerial(serial))) return detail;
         return null;
     }
@@ -138,9 +153,10 @@ class DB {
          * @type {DB}
          */
         var result = new DB();
-        this.books.forEach(book => {
-            if (book.title.includes(title)) result.books.push(book);
-        });
+        if (title)
+            this.books.forEach(book => {
+                if (book.title.includes(title)) result.books.push(book);
+            });
         return result;
     }
     /**
@@ -154,9 +170,10 @@ class DB {
          * @type {DB}
          */
         var result = new DB();
-        this.books.forEach(book => {
-            if (book.actor.includes(actor)) result.books.push(book);
-        });
+        if (actor)
+            this.books.forEach(book => {
+                if (book.actor.includes(actor)) result.books.push(book);
+            });
         return result;
     }
     /**
@@ -181,11 +198,23 @@ class DB {
      * @returns {Person}
      */
     getUserByID(id) {
-        this.persons.forEach((person) => {
-            if (person.id == id)
-                return person;
+        var result = null;
+        this.persons.forEach(person => {
+            if (person.id == id) result = person;
         });
-        return null;
+        return result;
+    }
+    /**
+     * 会員番号から会員のインデックスを返します。無しはnullです。
+     * @param {Number} id 会員番号
+     * @returns {Number}
+     */
+    getUserIdxByID(id) {
+        var result = null;
+        this.persons.forEach((person, index) => {
+            if (person.id == id) result = index;
+        });
+        return result;
     }
     /**
      * 本の貸し出しを登録します。成功失敗を返します。
@@ -219,6 +248,30 @@ class DB {
         }
         return false;
     }
+    /**
+     * 同志を合体します。
+     * @param {DB} db 併合元
+     */
+    marge(db) {
+        db.persons.forEach(person => {
+            if (!this.getUserByID(person.id)) this.persons.push(person);
+        });
+        db.books.forEach(book => {
+            if (!this.getBookByISBN(book.isbn)) this.books.push(book);
+        });
+    }
+    //diff(db){
+    //    db.persons.forEach((person)=>{
+    //        var p = this.getUserIdxByID(person.id);
+    //        if(p)
+    //            this.persons.splice(p,1);
+    //    });
+    //    db.books.forEach((book)=>{
+    //        var b = this.getBookIdxByISBN(book.isbn);
+    //        if(b)
+    //            this.books.splice(b,1);
+    //    });
+    //}
 }
 
 /**
@@ -270,7 +323,7 @@ function bookRegist() {
     var form = document.forms.bookRegistForm;
     var ISBN = Number(form.ISBN.value);
 
-    if (!db.searchISBN(ISBN)) {
+    if (!db.getBookByISBN(ISBN)) {
         var title = form.index.value;
         var actor = form.actor.value;
         var date = new Date(form.date.value);
@@ -288,19 +341,19 @@ function bookRegist() {
  * ISBNから本を特定してシリアル番号登録します
  */
 function serialRegist() {
-    var ISBN = QS('#Book tr.selected').book.isbn;
+    var ISBN = QS("#Book tr.selected").book.isbn;
 
-    if (db.searchISBN(ISBN)) {
+    if (db.getBookByISBN(ISBN)) {
         var serial = Number(document.forms.serialRegistForm.serial.value);
         if (!db.searchSerial(ISBN, serial))
-            db.searchISBN(ISBN).sub.push(new BookDetail(serial));
+            db.getBookByISBN(ISBN).sub.push(new BookDetail(serial));
         else alert("どうやら既に存在するシリアルコードのようです。");
     } else {
         alert(
             "一致するISBNコードが無いようです、書籍データから作ってください。"
         );
     }
-    QS('#Book .selected').be
+    QS("#Book .selected").be;
 }
 
 function Rental() {
@@ -338,8 +391,14 @@ function search() {
      */
     var form = document.forms.bookSearchForm;
     var title = form.index.value;
+    var actor = form.actor.value;
 
     var result = db.getBooksByTitle(title);
+    //if(form.andor.value=='AND')
+    //    result.diff(db.getBooksByActor(actor));
+    //else
+    result.marge(db.getBooksByActor(actor));
+
     showBooks(result);
 }
 
@@ -353,8 +412,8 @@ function showBooks(database) {
     table.appendChild(createHeadline(database));
     table.appendChild(listBookRecoads(database));
 
-    QS('.resultArea').innerHTML = '';
-    QS('.resultArea').appendChild(table);
+    QS(".resultArea").innerHTML = "";
+    QS(".resultArea").appendChild(table);
 }
 
 /**
@@ -365,22 +424,27 @@ function showBooks(database) {
 function listBookRecoads(database) {
     var tbody = document.createElement("tbody");
     database.books.forEach(book => {
-        tbody.appendChild((() => {
-            var record = document.createElement("tr");
-            Object.keys(book).forEach((key) => {
-                if (key != 'sub')
-                    record.appendChild((() => {
-                        var colElement = CE("td");
-                        if (key == 'date')
-                            colElement.innerText = getDateString(book[key]);
-                        else
-                            colElement.innerText = book[key];
-                        return colElement;
-                    })());
-            });
-            record.book = book;
-            return record;
-        })());
+        tbody.appendChild(
+            (() => {
+                var record = document.createElement("tr");
+                Object.keys(book).forEach(key => {
+                    if (key != "sub")
+                        record.appendChild(
+                            (() => {
+                                var colElement = CE("td");
+                                if (key == "date")
+                                    colElement.innerText = getDateString(
+                                        book[key]
+                                    );
+                                else colElement.innerText = book[key];
+                                return colElement;
+                            })()
+                        );
+                });
+                record.book = book;
+                return record;
+            })()
+        );
     });
     return tbody;
 }
@@ -393,18 +457,22 @@ function listBookRecoads(database) {
 function listPersonRecoads(database) {
     var tbody = document.createElement("tbody");
     database.persons.forEach(person => {
-        tbody.appendChild((() => {
-            var record = document.createElement("tr");
-            Object.keys(person).forEach((key) => {
-                record.appendChild((() => {
-                    var colElement = CE("td");
-                    colElement.innerText = person[key];
-                    return colElement;
-                })());
-            });
-            record.person = person;
-            return record;
-        })());
+        tbody.appendChild(
+            (() => {
+                var record = document.createElement("tr");
+                Object.keys(person).forEach(key => {
+                    record.appendChild(
+                        (() => {
+                            var colElement = CE("td");
+                            colElement.innerText = person[key];
+                            return colElement;
+                        })()
+                    );
+                });
+                record.person = person;
+                return record;
+            })()
+        );
     });
     return tbody;
 }
@@ -416,30 +484,37 @@ function listPersonRecoads(database) {
  */
 function createHeadline(database) {
     var thead = document.createElement("thead");
-    thead.appendChild((() => {
-        var headline = CE("tr");
-        Object.keys(database.books[0]).forEach((key) => {
-            if (key != 'sub')
-                headline.appendChild((() => {
-                    var column = CE('th');
-                    column.innerText = key;
-                    return column;
-                })());
-        });
-        return headline;
-    })());
+    thead.appendChild(
+        (() => {
+            var headline = CE("tr");
+            Object.keys(database.books[0]).forEach(key => {
+                if (key != "sub")
+                    headline.appendChild(
+                        (() => {
+                            var column = CE("th");
+                            column.innerText = key;
+                            return column;
+                        })()
+                    );
+            });
+            return headline;
+        })()
+    );
     return thead;
 }
 
 /**
-* Dateインスタンスを'YYYY年MM月DD日'形式で返します。
-* @param {Date} date 年月日
-* @returns {String}
-*/
+ * Dateインスタンスを'YYYY年MM月DD日'形式で返します。
+ * @param {Date} date 年月日
+ * @returns {String}
+ */
 function getDateString(date) {
-    var result = '';
+    var result = "";
     if (date)
-        result = `${date.getFullYear()}年${('  ' + (date.getMonth() + 1)).substr(-2)}月${('  ' + date.getDate()).substr(-2)}日`;
+        result = `${date.getFullYear()}年${(
+            "  " +
+            (date.getMonth() + 1)
+        ).substr(-2)}月${("  " + date.getDate()).substr(-2)}日`;
     return result;
 }
 
@@ -474,19 +549,19 @@ function tabChange(e) {
  * 書籍情報のテーブルのtbodyに書籍リストをセットします。
  */
 function viewBookList() {
-    QS('#Book tbody').replaceWith(listBookRecoads(db));
-    document.querySelectorAll('#Book tbody tr').forEach((row) => {
-        row.addEventListener('click', (e) => {
+    QS("#Book tbody").replaceWith(listBookRecoads(db));
+    document.querySelectorAll("#Book tbody tr").forEach(row => {
+        row.addEventListener("click", e => {
             try {
-                QS('#Book tbody tr.selected').classList.remove('selected');
-            } catch{ }
+                QS("#Book tbody tr.selected").classList.remove("selected");
+            } catch {}
             if (!e) e = event;
             var target = e.target;
-            while (target.tagName != 'TR') {
+            while (target.tagName != "TR") {
                 target = target.parentElement;
             }
-            target.classList.add('selected');
-            QS('#Detail tbody').replaceWith(viewBookDetail(target.book));
+            target.classList.add("selected");
+            QS("#Detail tbody").replaceWith(viewBookDetail(target.book));
         });
     });
 }
@@ -497,15 +572,13 @@ function viewBookList() {
  * @returns {HTMLTableSectionElement}
  */
 function viewBookDetail(book) {
-    var tbody = CE('tbody');
-    book.sub.forEach((detail) => {
-        var record = CE('tr');
-        Object.keys(detail).forEach((key) => {
-            var col = CE('td');
-            if (key == 'date')
-                col.innerText = getDateString(detail[key]);
-            else
-                col.innerText = detail[key];
+    var tbody = CE("tbody");
+    book.sub.forEach(detail => {
+        var record = CE("tr");
+        Object.keys(detail).forEach(key => {
+            var col = CE("td");
+            if (key == "date") col.innerText = getDateString(detail[key]);
+            else col.innerText = detail[key];
             record.appendChild(col);
         });
         tbody.appendChild(record);
@@ -514,10 +587,22 @@ function viewBookDetail(book) {
 }
 
 /**
+ * 指定されたHTMLタグまで親に上ります。
+ * @param {HTMLElement} element HTMLエレメント
+ * @param {String} tagName HTMLタグの名前
+ * @returns {HTMLElement}
+ */
+function goBackByTagName(element, tagName) {
+    tagName = tagName.toUpperCase();
+    while (element.tagName != tagName) element = element.parentElement;
+    return element;
+}
+
+/**
  * 会員情報のテーブルのtbodyに会員リストをセットします。
  */
 function viewPersonList() {
-    QS('#Person tbody').replaceWith(listPersonRecoads(db));
+    QS("#Person tbody").replaceWith(listPersonRecoads(db));
 }
 
 (() => {
@@ -529,37 +614,68 @@ function viewPersonList() {
     });
 
     //テストデータ挿入,データは適当
-    db.books.push(new Book(5784932643, '吾輩は猫である', '夏目漱石', new Date('Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
-    db.books[db.books.length - 1].sub.push(new BookDetail(1))
-    db.books.push(new Book(6243251643, '坊ちゃん', '夏目漱石', new Date('Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
-    db.books[db.books.length - 1].sub.push(new BookDetail(2))
-    db.books.push(new Book(5431903042, '学問のすゝめ', '福沢諭吉', new Date('Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)'), 0));
-    db.books[db.books.length - 1].sub.push(new BookDetail(3))
-    db.persons.push(new Person('鈴木', '北海道', '080xxxxxxxx', 'aaaa@example.com'));
+    db.books.push(
+        new Book(
+            5784932643,
+            "吾輩は猫である",
+            "夏目漱石",
+            new Date("Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)"),
+            0
+        )
+    );
+    db.books[db.books.length - 1].sub.push(new BookDetail(1));
+    db.books.push(
+        new Book(
+            6243251643,
+            "坊ちゃん",
+            "夏目漱石",
+            new Date("Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)"),
+            0
+        )
+    );
+    db.books[db.books.length - 1].sub.push(new BookDetail(2));
+    db.books.push(
+        new Book(
+            5431903042,
+            "学問のすゝめ",
+            "福沢諭吉",
+            new Date("Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)"),
+            0
+        )
+    );
+    db.books[db.books.length - 1].sub.push(new BookDetail(3));
+    db.persons.push(
+        new Person("鈴木", "北海道", "080xxxxxxxx", "aaaa@example.com")
+    );
     db.persons[db.persons.length - 1].generateID();
-    db.persons.push(new Person('佐藤', '青森県', '080yyyyyyyy', 'bbbb@example.com'));
+    db.persons.push(
+        new Person("佐藤", "青森県", "080yyyyyyyy", "bbbb@example.com")
+    );
     db.persons[db.persons.length - 1].generateID();
-    db.persons.push(new Person('田中', '秋田県', '080zzzzzzzz', 'cccc@example.com'));
+    db.persons.push(
+        new Person("田中", "秋田県", "080zzzzzzzz", "cccc@example.com")
+    );
     db.persons[db.persons.length - 1].generateID();
 })();
 
 //書籍情報登録フォーム用
 (() => {
-    QS('li.bookRegist').addEventListener('click', viewBookList);
-    QS('#Book input[value="登録"]').addEventListener('click', viewBookList);
-    QS('#bookRegistShow').addEventListener('click', registButtonClick);
+    QS("li.bookRegist").addEventListener("click", viewBookList);
+    QS('#Book input[value="登録"]').addEventListener("click", viewBookList);
+    QS("#bookRegistShow").addEventListener("click", registButtonClick);
     var toggle = false;
     function registButtonClick(e) {
         if (!e) e = event;
+        var target = goBackByTagName(e.target, "tr");
         if (!toggle) {
-            e.target.classList.add('showed');
-            document.querySelectorAll('#Book .bookRegistForm').forEach((trow) => {
-                trow.style.display = 'table-row';
+            target.classList.add("showed");
+            document.querySelectorAll("#Book .bookRegistForm").forEach(trow => {
+                trow.style.display = "table-row";
             });
-        }else{
-            e.target.classList.remove('showed');
-            document.querySelectorAll('#Book .bookRegistForm').forEach((trow) => {
-                trow.style.display = 'none';
+        } else {
+            target.classList.remove("showed");
+            document.querySelectorAll("#Book .bookRegistForm").forEach(trow => {
+                trow.style.display = "none";
             });
         }
         toggle = !toggle;
@@ -568,22 +684,27 @@ function viewPersonList() {
 
 //会員情報登録フォーム用
 (() => {
-    QS('li.userRegist').addEventListener('click', viewPersonList);
-    QS('#Person input[value="登録"]').addEventListener('click', viewPersonList);
-    QS('#userRegistShow').addEventListener('click', registButtonClick);
+    QS("li.userRegist").addEventListener("click", viewPersonList);
+    QS('#Person input[value="登録"]').addEventListener("click", viewPersonList);
+    QS("#userRegistShow").addEventListener("click", registButtonClick);
     var toggle = false;
     function registButtonClick(e) {
         if (!e) e = event;
+        var target = goBackByTagName(e.target, "tr");
         if (!toggle) {
-        e.target.classList.add('showed');
-        document.querySelectorAll('#Person .userRegistForm').forEach((trow) => {
-            trow.style.display = 'table-row';
-        });
-        }else{
-            e.target.classList.remove('showed');
-            document.querySelectorAll('#Person .userRegistForm').forEach((trow) => {
-                trow.style.display = 'none';
-            });
+            target.classList.add("showed");
+            document
+                .querySelectorAll("#Person .userRegistForm")
+                .forEach(trow => {
+                    trow.style.display = "table-row";
+                });
+        } else {
+            target.classList.remove("showed");
+            document
+                .querySelectorAll("#Person .userRegistForm")
+                .forEach(trow => {
+                    trow.style.display = "none";
+                });
         }
         toggle = !toggle;
     }

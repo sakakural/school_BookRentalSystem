@@ -60,7 +60,7 @@ textarea {
     border-right: 10px solid transparent;
     border-top: 10px solid rgb(0, 0, 0);
 }
-.triangle.showed {
+.showed .triangle{
     position: relative;
     width: 0;
     height: 0;
