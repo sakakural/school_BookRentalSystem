@@ -3,7 +3,7 @@ class BookDetail {
      * ステータスfalse,貸出年月日もnull
      * @param {Number} serial ユニークな本のシリアルコード
      */
-    constructor(isbn,serial) {
+    constructor(isbn, serial) {
         /**
          * @type {Number} ISBNコード
          */
@@ -87,13 +87,13 @@ class DB {
      * @param {Number} isbn 書籍ISBNコード
      * @returns {Array<BookDetail>}
      */
-    getBookDetailsByISBN(isbn){
+    getBookDetailsByISBN(isbn) {
         /**
          * @type {Array<BookDetail>}
          */
         var result = [];
-        this.bookDetails.forEach((bookDetail)=>{
-            if(bookDetail.isbn==isbn)
+        this.bookDetails.forEach((bookDetail) => {
+            if (bookDetail.isbn == isbn)
                 result.push(bookDetail);
         });
         return result;
@@ -133,8 +133,8 @@ class DB {
          * @type {BookDetail}
          */
         var result = null;
-        this.bookDetails.forEach((bookDetail)=>{
-            if(bookDetail.isbn==isbn&&bookDetail.serial==serial)
+        this.bookDetails.forEach((bookDetail) => {
+            if (bookDetail.isbn == isbn && bookDetail.serial == serial)
                 result = bookDetail;
         });
         return result;
@@ -343,7 +343,7 @@ function serialRegist() {
     if (db.getBookByISBN(ISBN)) {
         var serial = Number(document.forms.serialRegistForm.serial.value);
         if (!db.getBookDetailByISBNSerial(ISBN, serial))
-            db.bookDetails.push(new BookDetail(ISBN,serial));
+            db.bookDetails.push(new BookDetail(ISBN, serial));
         else alert("どうやら既に存在するシリアルコードのようです。");
     } else {
         alert(
@@ -551,7 +551,7 @@ function viewBookList() {
         row.addEventListener("click", e => {
             try {
                 QS("#Book tbody tr.selected").classList.remove("selected");
-            } catch {}
+            } catch { }
             if (!e) e = event;
             var target = e.target;
             while (target.tagName != "TR") {
@@ -573,7 +573,7 @@ function viewBookDetail(book) {
     db.getBookDetailsByISBN(book.isbn).forEach(detail => {
         var record = CE("tr");
         Object.keys(detail).forEach(key => {
-            if(key=='isbn')
+            if (key == 'isbn')
                 return;
             var col = CE("td");
             if (key == "date") col.innerText = getDateString(detail[key]);
@@ -604,6 +604,39 @@ function viewPersonList() {
     QS("#Person tbody").replaceWith(listPersonRecoads(db));
 }
 
+var gasDBUrl = "GASDBを導入したURL";
+
+function save() {
+    var request = new XMLHttpRequest();
+    request.open("POST", gasDBUrl , true);
+    request.onreadystatechange = () => {
+        if (request.readyState != 4 || request.status != 200) return;
+        console.log(request.responseText);
+    };
+    var json = JSON.stringify(db)
+    console.log(json);
+    request.send(json);
+}
+
+function load() {
+    var request = new XMLHttpRequest();
+    request.open("GET", gasDBUrl , true);
+    request.onreadystatechange = () => {
+        var json = JSON.parse(request.responseText);
+        Object.keys(json).forEach((k) => {
+            json[k].forEach((table) => {
+                Object.keys(table).forEach((key) => {
+                    if (key == 'date')
+                        table[key] = new Date(String(table[key]));
+                });
+            });
+            db[k] = json[k];
+        });
+        return;
+    };
+    request.send();
+}
+
 (() => {
     document.querySelectorAll("nav li").forEach(element => {
         element.addEventListener("click", tabChange);
@@ -613,50 +646,51 @@ function viewPersonList() {
     });
 
     //テストデータ挿入,データは適当
-    db.books.push(
-        new Book(
-            5784932643,
-            "吾輩は猫である",
-            "夏目漱石",
-            new Date("Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)"),
-            0
-        )
-    );
-    db.bookDetails.push(new BookDetail(5784932643,1));
-    db.books.push(
-        new Book(
-            6243251643,
-            "坊ちゃん",
-            "夏目漱石",
-            new Date("Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)"),
-            0
-        )
-    );
-    db.books.push(
-        new Book(
-            5431903042,
-            "学問のすゝめ",
-            "福沢諭吉",
-            new Date("Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)"),
-            0
-        )
-    );
-    db.persons.push(
-        new Person("鈴木", "北海道", "080xxxxxxxx", "aaaa@example.com")
-    );
-    db.persons[db.persons.length - 1].generateID();
-    db.persons.push(
-        new Person("佐藤", "青森県", "080yyyyyyyy", "bbbb@example.com")
-    );
-    db.persons[db.persons.length - 1].generateID();
-    db.persons.push(
-        new Person("田中", "秋田県", "080zzzzzzzz", "cccc@example.com")
-    );
-    db.persons[db.persons.length - 1].generateID();
+    //db.books.push(
+    //    new Book(
+    //        5784932643,
+    //        "吾輩は猫である",
+    //        "夏目漱石",
+    //        new Date("Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)"),
+    //        0
+    //    )
+    //);
+    //db.bookDetails.push(new BookDetail(5784932643, 1));
+    //db.books.push(
+    //    new Book(
+    //        6243251643,
+    //        "坊ちゃん",
+    //        "夏目漱石",
+    //        new Date("Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)"),
+    //        0
+    //    )
+    //);
+    //db.books.push(
+    //    new Book(
+    //        5431903042,
+    //        "学問のすゝめ",
+    //        "福沢諭吉",
+    //        new Date("Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)"),
+    //        0
+    //    )
+    //);
+    //db.persons.push(
+    //    new Person("鈴木", "北海道", "080xxxxxxxx", "aaaa@example.com")
+    //);
+    //db.persons[db.persons.length - 1].generateID();
+    //db.persons.push(
+    //    new Person("佐藤", "青森県", "080yyyyyyyy", "bbbb@example.com")
+    //);
+    //db.persons[db.persons.length - 1].generateID();
+    //db.persons.push(
+    //    new Person("田中", "秋田県", "080zzzzzzzz", "cccc@example.com")
+    //);
+    //db.persons[db.persons.length - 1].generateID();
 })();
 
 //書籍情報登録フォーム用
 (() => {
+    console.log(new Date('2019-01-25T00:00:00.000Z'));
     QS("li.bookRegist").addEventListener("click", viewBookList);
     QS('#Book input[value="登録"]').addEventListener("click", viewBookList);
     QS("#bookRegistShow").addEventListener("click", registButtonClick);
