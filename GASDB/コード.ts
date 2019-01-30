@@ -70,51 +70,36 @@ class Person {
     public id;
 }
 class DB {
-    constructor() {
-        /**
-         * 書籍データ群用配列
-         * @type {Array<Book>}
-         */
-        this.books = [];
-        /**
-         * ユーザー用配列
-         * @type {Array<Person>}
-         */
-        this.persons = [];
-        /**
-         * 書籍詳細情報配列
-         * @type {Array<BookDetail>}
-         */
-        this.bookDetails = [];
-    }
-    public books;
-    public persons;
-    public bookDetails;
+    /**
+     * 書籍データ群用配列
+     */
+    public books = new Array<Book>();
+    /**
+     * ユーザー用配列
+     */
+    public persons = new Array<Person>();
+    /**
+     * 書籍詳細情報配列
+     */
+    public bookDetails = new Array<BookDetail>();
 }
 
 function doPost(e) {
-    var json = JSON.parse(e.postData.getDataAsString());
+    var json: DB;
+    json = JSON.parse(e.postData.getDataAsString());
     var SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
-    var bookSheet = SpreadSheet.getSheetByName('Book');
-    var bookDetailSheet = SpreadSheet.getSheetByName('BookDetail');
-    var personSheet = SpreadSheet.getSheetByName('Person');
-
-    bookSheet.clear();
-    bookSheet.appendRow(['isbn', 'title', 'date', 'code', 'actor']);
-    json.books.forEach(function (book) {
-        bookSheet.appendRow([book.isbn, book.title, book.date, book.code, book.actor]);
-    });
-
-    personSheet.clear();
-    personSheet.appendRow(['id', 'name', 'email', 'address', 'tel']);
-    json.persons.forEach(function (person) {
-        personSheet.appendRow([person.id, person.name, person.email, person.address, person.tel]);
-    });
-
-    bookDetailSheet.clear();
-    bookDetailSheet.appendRow(['isbn', 'serial', 'status', 'date']);
-    json.bookDetails.forEach(function (bookDetail) {
-        bookDetailSheet.appendRow([bookDetail.isbn, bookDetail.serial, bookDetail.status, bookDetail.date]);
+    
+    Object.keys(json).forEach((tableName) => {
+        var sheet = SpreadSheet.getSheetByName(tableName);
+        sheet.clear();
+        sheet.appendRow(Object.keys(json[tableName][0]));
+        json[tableName].forEach((record: Array<String>) => {
+            var row = new Array<String>();
+            Object.keys(record).forEach((data) => {
+                row.push(record[data]);
+            });
+            sheet.appendRow(row);
+        });
     });
 
     var output = ContentService.createTextOutput();
@@ -127,44 +112,27 @@ function doPost(e) {
 function doGet() {
     var json = new DB();
     var SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
-    var bookSheet = SpreadSheet.getSheetByName('Book');
-    var bookDetailSheet = SpreadSheet.getSheetByName('BookDetail');
-    var personSheet = SpreadSheet.getSheetByName('Person');
 
-    var bookKeys = ['isbn', 'title', 'date', 'code', 'actor'];
-    var booksDatas = bookSheet.getDataRange().getValues();
-    booksDatas.shift();
-
-    booksDatas.forEach(function (datas, index) {
-        json.books.push({});
-        datas.forEach(function (data, keyIdx) {
-            json.books[index][bookKeys[keyIdx]] = data;
+    Object.keys(new DB).forEach((tableName)=>{
+        var sheet = SpreadSheet.getSheetByName(tableName);
+        var datas = sheet.getDataRange().getValues();
+        var top = datas.shift();
+        var headlines = new Array<string>();
+        top.forEach((data)=>{
+            headlines.push(data.toString())
         });
-    });
-
-    var bookDetailKeys = ['isbn', 'serial', 'status', 'date'];
-    var booksDetailDatas = bookDetailSheet.getDataRange().getValues();
-    booksDetailDatas.shift();
-    booksDetailDatas.forEach(function (datas, index) {
-        json.bookDetails.push({});
-        datas.forEach(function (data, keyIdx) {
-            json.bookDetails[index][bookDetailKeys[keyIdx]] = data;
-        });
-    });
-
-    var personKeys = ['id', 'name', 'email', 'address', 'tel'];
-    var personsDatas = personSheet.getDataRange().getValues();
-    personsDatas.shift();
-    personsDatas.forEach(function (datas, index) {
-        json.persons.push({});
-        datas.forEach(function (data, keyIdx) {
-            json.persons[index][personKeys[keyIdx]] = data;
+        datas.forEach((record)=>{
+            var row = new Object;
+            record.forEach((value,idx)=>{
+                row[headlines[idx]] = value;
+            });
+            json[tableName].push(row);
         });
     });
 
     var output = ContentService.createTextOutput();
     output.setMimeType(ContentService.MimeType.JSON);
-    output.setContent(JSON.stringify(json,null,'  '));
+    output.setContent(JSON.stringify(json, null, '  '));
 
     return output;
 }
