@@ -3,7 +3,11 @@ class BookDetail {
      * ステータスfalse,貸出年月日もnull
      * @param {Number} serial ユニークな本のシリアルコード
      */
-    constructor(serial) {
+    constructor(isbn,serial) {
+        /**
+         * @type {Number} ISBNコード
+         */
+        this.isbn = isbn;
         /**
          * @type {Number} シリアル番号
          */
@@ -33,32 +37,6 @@ class Book {
         this.actor = actor;
         this.date = date;
         this.code = code;
-
-        /**
-         * 書籍のデータを格納する配列です
-         * @type {Array<BookDetail>}
-         */
-        this.sub = [];
-    }
-    /**
-     * 特定の本の中からシリアル番号で検索します。
-     * @param {Number} serial シリアル番号
-     */
-    searchSerial(serial) {
-        for (var detail of this.sub)
-            if (detail.serial === serial) return detail;
-        return null;
-    }
-    /**
-     * 特定の本を借りているか検索します。
-     * @param {Number} id 会員番号
-     * @returns {Boolean}
-     */
-    isLend(id) {
-        for (var detail of this.sub) {
-            if (detail.status == id) return true;
-        }
-        return false;
     }
 }
 class Person {
@@ -98,6 +76,27 @@ class DB {
          * @type {Array<Person>}
          */
         this.persons = [];
+        /**
+         * 書籍詳細情報配列
+         * @type {Array<BookDetail>}
+         */
+        this.bookDetails = [];
+    }
+    /**
+     * ISBNコードからBookDetailを取ってきます
+     * @param {Number} isbn 書籍ISBNコード
+     * @returns {Array<BookDetail>}
+     */
+    getBookDetailsByISBN(isbn){
+        /**
+         * @type {Array<BookDetail>}
+         */
+        var result = [];
+        this.bookDetails.forEach((bookDetail)=>{
+            if(bookDetail.isbn==isbn)
+                result.push(bookDetail);
+        });
+        return result;
     }
     /**
      * ISBNから書籍を検索します。なければnullを返します。
@@ -129,18 +128,16 @@ class DB {
      * @param {Number} serial シリアルコード
      * @returns {BookDetail} 書籍詳細情報、なければnull
      */
-    searchSerial(isbn, serial) {
-        /**
-         * @type {Book}
-         */
-        var book;
+    getBookDetailByISBNSerial(isbn, serial) {
         /**
          * @type {BookDetail}
          */
-        var detail;
-        if ((book = this.getBookByISBN(isbn)))
-            if ((detail = book.searchSerial(serial))) return detail;
-        return null;
+        var result = null;
+        this.bookDetails.forEach((bookDetail)=>{
+            if(bookDetail.isbn==isbn&&bookDetail.serial==serial)
+                result = bookDetail;
+        });
+        return result;
     }
     /**
      * 本のタイトルから本を検索します
@@ -224,7 +221,7 @@ class DB {
      * @returns {Boolean}
      */
     Rental(isbn, serial, id) {
-        var abook = this.searchSerial(isbn, serial);
+        var abook = this.getBookDetailByISBNSerial(isbn, serial);
         if (abook && !abook.status) {
             abook.status = id;
             abook.date = new Date(Date.now());
@@ -240,7 +237,7 @@ class DB {
      * @returns {Boolean}
      */
     Return(isbn, serial, id) {
-        var abook = this.searchSerial(isbn, serial);
+        var abook = this.getBookDetailByISBNSerial(isbn, serial);
         if (abook && abook.status == id) {
             abook.status = null;
             abook.date = null;
@@ -345,8 +342,8 @@ function serialRegist() {
 
     if (db.getBookByISBN(ISBN)) {
         var serial = Number(document.forms.serialRegistForm.serial.value);
-        if (!db.searchSerial(ISBN, serial))
-            db.getBookByISBN(ISBN).sub.push(new BookDetail(serial));
+        if (!db.getBookDetailByISBNSerial(ISBN, serial))
+            db.bookDetails.push(new BookDetail(ISBN,serial));
         else alert("どうやら既に存在するシリアルコードのようです。");
     } else {
         alert(
@@ -573,9 +570,11 @@ function viewBookList() {
  */
 function viewBookDetail(book) {
     var tbody = CE("tbody");
-    book.sub.forEach(detail => {
+    db.getBookDetailsByISBN(book.isbn).forEach(detail => {
         var record = CE("tr");
         Object.keys(detail).forEach(key => {
+            if(key=='isbn')
+                return;
             var col = CE("td");
             if (key == "date") col.innerText = getDateString(detail[key]);
             else col.innerText = detail[key];
@@ -623,7 +622,7 @@ function viewPersonList() {
             0
         )
     );
-    db.books[db.books.length - 1].sub.push(new BookDetail(1));
+    db.bookDetails.push(new BookDetail(5784932643,1));
     db.books.push(
         new Book(
             6243251643,
@@ -633,7 +632,6 @@ function viewPersonList() {
             0
         )
     );
-    db.books[db.books.length - 1].sub.push(new BookDetail(2));
     db.books.push(
         new Book(
             5431903042,
@@ -643,7 +641,6 @@ function viewPersonList() {
             0
         )
     );
-    db.books[db.books.length - 1].sub.push(new BookDetail(3));
     db.persons.push(
         new Person("鈴木", "北海道", "080xxxxxxxx", "aaaa@example.com")
     );
