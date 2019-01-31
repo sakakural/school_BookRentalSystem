@@ -517,30 +517,10 @@ function getDateString(date) {
 
 function output() {
     QS("#exportArea").value = JSON.stringify(db, null, "  ");
-    QS("#exportArea").style.display = "block";
-}
-
-/**
- * タブを変更したときの関数
- * @param {Event} e FireFoxの場合ここにイベント発行元のオブジェクトが来ます。
- */
-function tabChange(e) {
-    if (!e) e = event;
-    /**
-     * @type {Element}
-     */
-    var target = e.target;
-    document.querySelectorAll("section").forEach(element => {
-        if (element.className === target.className)
-            element.style.display = "block";
-        else element.style.display = "none";
-    });
-    document.querySelectorAll("nav li").forEach(element => {
-        if (element.classList.contains("selected"))
-            element.classList.remove("selected");
-    });
-    target.classList.add("selected");
-}
+//function output() {
+//    QS("#exportArea").value = JSON.stringify(db, null, "  ");
+//    QS("#exportArea").style.display = "block";
+//}
 
 /**
  * 書籍情報のテーブルのtbodyに書籍リストをセットします。
@@ -604,11 +584,10 @@ function viewPersonList() {
     QS("#Person tbody").replaceWith(listPersonRecoads(db));
 }
 
-var gasDBUrl = "GASDBを導入したURL";
 
 function save() {
     var request = new XMLHttpRequest();
-    request.open("POST", gasDBUrl , true);
+    request.open("POST", gasDBUrl, true);
     request.onreadystatechange = () => {
         if (request.readyState != 4 || request.status != 200) return;
         console.log(request.responseText);
@@ -620,7 +599,7 @@ function save() {
 
 function load() {
     var request = new XMLHttpRequest();
-    request.open("GET", gasDBUrl , true);
+    request.open("GET", gasDBUrl, true);
     request.onreadystatechange = () => {
         var json = JSON.parse(request.responseText);
         Object.keys(json).forEach((k) => {
@@ -637,61 +616,8 @@ function load() {
     request.send();
 }
 
-(() => {
-    document.querySelectorAll("nav li").forEach(element => {
-        element.addEventListener("click", tabChange);
-    });
-    document.querySelectorAll("section").forEach(element => {
-        element.style.display = "none";
-    });
-
-    //テストデータ挿入,データは適当
-    //db.books.push(
-    //    new Book(
-    //        5784932643,
-    //        "吾輩は猫である",
-    //        "夏目漱石",
-    //        new Date("Fri Jan 25 2019 09:00:00 GMT+0900 (日本標準時)"),
-    //        0
-    //    )
-    //);
-    //db.bookDetails.push(new BookDetail(5784932643, 1));
-    //db.books.push(
-    //    new Book(
-    //        6243251643,
-    //        "坊ちゃん",
-    //        "夏目漱石",
-    //        new Date("Thu Jan 24 2019 09:00:00 GMT+0900 (日本標準時)"),
-    //        0
-    //    )
-    //);
-    //db.books.push(
-    //    new Book(
-    //        5431903042,
-    //        "学問のすゝめ",
-    //        "福沢諭吉",
-    //        new Date("Wed Jan 23 2019 09:00:00 GMT+0900 (日本標準時)"),
-    //        0
-    //    )
-    //);
-    //db.persons.push(
-    //    new Person("鈴木", "北海道", "080xxxxxxxx", "aaaa@example.com")
-    //);
-    //db.persons[db.persons.length - 1].generateID();
-    //db.persons.push(
-    //    new Person("佐藤", "青森県", "080yyyyyyyy", "bbbb@example.com")
-    //);
-    //db.persons[db.persons.length - 1].generateID();
-    //db.persons.push(
-    //    new Person("田中", "秋田県", "080zzzzzzzz", "cccc@example.com")
-    //);
-    //db.persons[db.persons.length - 1].generateID();
-})();
-
 //書籍情報登録フォーム用
 (() => {
-    console.log(new Date('2019-01-25T00:00:00.000Z'));
-    QS("li.bookRegist").addEventListener("click", viewBookList);
     QS('#Book input[value="登録"]').addEventListener("click", viewBookList);
     QS("#bookRegistShow").addEventListener("click", registButtonClick);
     var toggle = false;
@@ -715,7 +641,6 @@ function load() {
 
 //会員情報登録フォーム用
 (() => {
-    QS("li.userRegist").addEventListener("click", viewPersonList);
     QS('#Person input[value="登録"]').addEventListener("click", viewPersonList);
     QS("#userRegistShow").addEventListener("click", registButtonClick);
     var toggle = false;
@@ -738,5 +663,48 @@ function load() {
                 });
         }
         toggle = !toggle;
+    }
+})();
+
+(() => {
+    var sections = new Object();
+    document.querySelectorAll('main>section').forEach((section) => {
+        sections[section.className] = section;
+        section.remove();
+    });
+
+    document.querySelectorAll("nav li").forEach(list => {
+        list.addEventListener("click", tabChange);
+    });
+
+    /**
+     * タブを変更したときの関数
+     * @param {Event} e FireFoxの場合ここにイベント発行元のオブジェクトが来ます。
+     */
+    function tabChange(e) {
+        if (!e) e = event;
+        /**
+         * @type {Element}
+         */
+        var target = e.target;
+        if(QS('.unselected')){
+            QS('.unselected').classList.remove('unselected');
+            QS('main').appendChild(sections[target.className]);
+        }
+        else{
+            var prev = QS('main>section');
+            sections[prev.className] = prev;
+            prev.remove();
+
+            QS('main').appendChild(sections[target.className]);
+            switch(target.className){
+                case 'bookRegist':
+                    viewBookList();
+                break;
+                case 'userRegist':
+                    viewPersonList();
+                break;
+            }
+        }
     }
 })();
