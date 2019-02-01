@@ -92,9 +92,8 @@ class DB {
          * @type {Array<BookDetail>}
          */
         var result = [];
-        this.bookDetails.forEach((bookDetail) => {
-            if (bookDetail.isbn == isbn)
-                result.push(bookDetail);
+        this.bookDetails.forEach(bookDetail => {
+            if (bookDetail.isbn == isbn) result.push(bookDetail);
         });
         return result;
     }
@@ -133,7 +132,7 @@ class DB {
          * @type {BookDetail}
          */
         var result = null;
-        this.bookDetails.forEach((bookDetail) => {
+        this.bookDetails.forEach(bookDetail => {
             if (bookDetail.isbn == isbn && bookDetail.serial == serial)
                 result = bookDetail;
         });
@@ -420,12 +419,27 @@ function showBooks(database) {
  */
 function listBookRecoads(database) {
     var tbody = document.createElement("tbody");
-    database.books.forEach(book => {
+    if (database.books[0]) {
         tbody.appendChild(
             (() => {
-                var record = document.createElement("tr");
-                Object.keys(book).forEach(key => {
-                    if (key != "sub")
+                var headlines = document.createElement("tr");
+                Object.keys(database.books[0]).forEach(key => {
+                    headlines.appendChild(
+                        (() => {
+                            var hdline = CE("th");
+                            hdline.innerText = key;
+                            return hdline;
+                        })()
+                    );
+                });
+                return headlines;
+            })()
+        );
+        database.books.forEach(book => {
+            tbody.appendChild(
+                (() => {
+                    var record = document.createElement("tr");
+                    Object.keys(book).forEach(key => {
                         record.appendChild(
                             (() => {
                                 var colElement = CE("td");
@@ -437,12 +451,13 @@ function listBookRecoads(database) {
                                 return colElement;
                             })()
                         );
-                });
-                record.book = book;
-                return record;
-            })()
-        );
-    });
+                    });
+                    record.book = book;
+                    return record;
+                })()
+            );
+        });
+    }
     return tbody;
 }
 
@@ -453,24 +468,41 @@ function listBookRecoads(database) {
  */
 function listPersonRecoads(database) {
     var tbody = document.createElement("tbody");
-    database.persons.forEach(person => {
+    if (database.persons[0]) {
         tbody.appendChild(
             (() => {
-                var record = document.createElement("tr");
-                Object.keys(person).forEach(key => {
-                    record.appendChild(
+                var headlines = document.createElement("tr");
+                Object.keys(database.persons[0]).forEach(key => {
+                    headlines.appendChild(
                         (() => {
-                            var colElement = CE("td");
-                            colElement.innerText = person[key];
-                            return colElement;
+                            var hdline = CE("th");
+                            hdline.innerText = key;
+                            return hdline;
                         })()
                     );
                 });
-                record.person = person;
-                return record;
+                return headlines;
             })()
         );
-    });
+        database.persons.forEach(person => {
+            tbody.appendChild(
+                (() => {
+                    var record = document.createElement("tr");
+                    Object.keys(person).forEach(key => {
+                        record.appendChild(
+                            (() => {
+                                var colElement = CE("td");
+                                colElement.innerText = person[key];
+                                return colElement;
+                            })()
+                        );
+                    });
+                    record.person = person;
+                    return record;
+                })()
+            );
+        });
+    }
     return tbody;
 }
 
@@ -515,8 +547,6 @@ function getDateString(date) {
     return result;
 }
 
-function output() {
-    QS("#exportArea").value = JSON.stringify(db, null, "  ");
 //function output() {
 //    QS("#exportArea").value = JSON.stringify(db, null, "  ");
 //    QS("#exportArea").style.display = "block";
@@ -531,7 +561,7 @@ function viewBookList() {
         row.addEventListener("click", e => {
             try {
                 QS("#Book tbody tr.selected").classList.remove("selected");
-            } catch { }
+            } catch {}
             if (!e) e = event;
             var target = e.target;
             while (target.tagName != "TR") {
@@ -553,8 +583,7 @@ function viewBookDetail(book) {
     db.getBookDetailsByISBN(book.isbn).forEach(detail => {
         var record = CE("tr");
         Object.keys(detail).forEach(key => {
-            if (key == 'isbn')
-                return;
+            if (key == "isbn") return;
             var col = CE("td");
             if (key == "date") col.innerText = getDateString(detail[key]);
             else col.innerText = detail[key];
@@ -584,6 +613,8 @@ function viewPersonList() {
     QS("#Person tbody").replaceWith(listPersonRecoads(db));
 }
 
+gasDBUrl =
+    "https://script.google.com/macros/s/AKfycbwgv5NQ9D6OTQyqoZ8k7niQCqM9gZMvfcyb6xISpxMPb5gYL54T/exec";
 
 function save() {
     var request = new XMLHttpRequest();
@@ -592,7 +623,7 @@ function save() {
         if (request.readyState != 4 || request.status != 200) return;
         console.log(request.responseText);
     };
-    var json = JSON.stringify(db)
+    var json = JSON.stringify(db);
     console.log(json);
     request.send(json);
 }
@@ -602,10 +633,10 @@ function load() {
     request.open("GET", gasDBUrl, true);
     request.onreadystatechange = () => {
         var json = JSON.parse(request.responseText);
-        Object.keys(json).forEach((k) => {
-            json[k].forEach((table) => {
-                Object.keys(table).forEach((key) => {
-                    if (key == 'date')
+        Object.keys(json).forEach(k => {
+            json[k].forEach(table => {
+                Object.keys(table).forEach(key => {
+                    if (key == "date")
                         table[key] = new Date(String(table[key]));
                 });
             });
@@ -668,7 +699,7 @@ function load() {
 
 (() => {
     var sections = new Object();
-    document.querySelectorAll('main>section').forEach((section) => {
+    document.querySelectorAll("main>section").forEach(section => {
         sections[section.className] = section;
         section.remove();
     });
@@ -687,23 +718,22 @@ function load() {
          * @type {Element}
          */
         var target = e.target;
-        if(QS('.unselected')){
-            QS('.unselected').classList.remove('unselected');
-            QS('main').appendChild(sections[target.className]);
-        }
-        else{
-            var prev = QS('main>section');
+        if (QS(".unselected")) {
+            QS(".unselected").classList.remove("unselected");
+            QS("main").appendChild(sections[target.className]);
+        } else {
+            var prev = QS("main>section");
             sections[prev.className] = prev;
             prev.remove();
 
-            QS('main').appendChild(sections[target.className]);
-            switch(target.className){
-                case 'bookRegist':
+            QS("main").appendChild(sections[target.className]);
+            switch (target.className) {
+                case "bookRegist":
                     viewBookList();
-                break;
-                case 'userRegist':
+                    break;
+                case "userRegist":
                     viewPersonList();
-                break;
+                    break;
             }
         }
     }
