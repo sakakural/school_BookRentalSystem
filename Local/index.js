@@ -515,8 +515,6 @@ function getDateString(date) {
     return result;
 }
 
-function output() {
-    QS("#exportArea").value = JSON.stringify(db, null, "  ");
 //function output() {
 //    QS("#exportArea").value = JSON.stringify(db, null, "  ");
 //    QS("#exportArea").style.display = "block";
@@ -584,6 +582,7 @@ function viewPersonList() {
     QS("#Person tbody").replaceWith(listPersonRecoads(db));
 }
 
+var gasDBUrl = "https://script.google.com/macros/s/AKfycbwgv5NQ9D6OTQyqoZ8k7niQCqM9gZMvfcyb6xISpxMPb5gYL54T/exec";
 
 function save() {
     var request = new XMLHttpRequest();
