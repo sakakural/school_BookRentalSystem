@@ -613,12 +613,7 @@ function viewPersonList() {
     QS("#Person tbody").replaceWith(listPersonRecoads(db));
 }
 
-<<<<<<< HEAD
 var gasDBUrl = "https://script.google.com/macros/s/AKfycbwgv5NQ9D6OTQyqoZ8k7niQCqM9gZMvfcyb6xISpxMPb5gYL54T/exec";
-=======
-gasDBUrl =
-    "https://script.google.com/macros/s/AKfycbwgv5NQ9D6OTQyqoZ8k7niQCqM9gZMvfcyb6xISpxMPb5gYL54T/exec";
->>>>>>> a9dc553c0054fc1069481ea1ad8ea5f1379267d6
 
 function save() {
     var request = new XMLHttpRequest();
