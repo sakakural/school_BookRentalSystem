@@ -1,0 +1,90 @@
+body.unselected{
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    align-content: center;
+    justify-content: center;
+    nav{
+        font-size: 40px;
+        margin: auto 0px;
+        ul{
+            display: flex;
+            flex-direction: column;
+            list-style: none;
+            li{
+                margin: 5px;
+                padding: 20px 40px;
+                text-align: center;
+                border-radius: 10px;
+                background-color: rgb(184, 184, 184);
+                cursor: pointer;
+            }
+            li:hover{
+                color: white;
+                background-color: rgb(82, 82, 82);
+            }
+        }
+    }
+    input{
+        display: none;
+    }
+}
+body{
+    font-size: 20px;
+    margin: 0px auto;
+    nav{
+        margin: auto 0px;
+        ul{
+            padding: 0px;
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            li{
+                margin: 2px;
+                padding: 3px 10px;
+                text-align: center;
+                border-radius: 3px;
+                background-color: rgb(184, 184, 184);
+                cursor: pointer;
+            }
+            li:hover{
+                color: white;
+                background-color: rgb(82, 82, 82);
+            }
+        }
+    }
+    table{
+        margin: 0px auto;
+        border-collapse: collapse;
+        tr{
+            text-align: center;
+            th,td{
+                border: 1px solid black;
+            }
+        }
+        .triangle{
+            position: relative;
+            width: 0;
+            height: 0;
+            top: 15px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgb(0, 0, 0);
+        }
+        .showed .triangle{
+            position: relative;
+            width: 0;
+            height: 0;
+            top: -15px;
+            border-top: 0px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid rgb(0, 0, 0);
+        }
+        input{
+            height: 100%;
+            width: 98%;
+            max-width: 100px;
+        }
+    }
+}

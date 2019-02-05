@@ -69,6 +69,13 @@ class Person {
     public email;
     public id;
 }
+class Histrory {
+    private id: number;
+    private isbn: number;
+    private type: string;
+    private date: Date;
+}
+
 class DB {
     /**
      * 書籍データ群用配列
@@ -82,13 +89,17 @@ class DB {
      * 書籍詳細情報配列
      */
     public bookDetails = new Array<BookDetail>();
+    /**
+     * 貸出履歴用配列
+     */
+    public histories = new Array<History>();
 }
 
 function doPost(e) {
     var json: DB;
     json = JSON.parse(e.postData.getDataAsString());
     var SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
-    
+
     Object.keys(json).forEach((tableName) => {
         var sheet = SpreadSheet.getSheetByName(tableName);
         sheet.clear();
@@ -113,21 +124,23 @@ function doGet() {
     var json = new DB();
     var SpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
 
-    Object.keys(new DB).forEach((tableName)=>{
+    Object.keys(new DB).forEach((tableName) => {
         var sheet = SpreadSheet.getSheetByName(tableName);
-        var datas = sheet.getDataRange().getValues();
-        var top = datas.shift();
-        var headlines = new Array<string>();
-        top.forEach((data)=>{
-            headlines.push(data.toString())
-        });
-        datas.forEach((record)=>{
-            var row = new Object;
-            record.forEach((value,idx)=>{
-                row[headlines[idx]] = value;
+        if(sheet){
+            var datas = sheet.getDataRange().getValues();
+            var top = datas.shift();
+            var headlines = new Array<string>();
+            top.forEach((data) => {
+                headlines.push(data.toString())
             });
-            json[tableName].push(row);
-        });
+            datas.forEach((record) => {
+                var row = new Object;
+                record.forEach((value, idx) => {
+                    row[headlines[idx]] = value;
+                });
+                json[tableName].push(row);
+            });
+        }
     });
 
     var output = ContentService.createTextOutput();

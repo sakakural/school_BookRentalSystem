@@ -1,72 +1,106 @@
-table {
-    border: 1px solid black;
-    table-layout: fixed;
-    border-collapse: collapse;
+body.unselected {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  align-content: center;
+  justify-content: center;
 }
-ul {
-    padding: 0px;
-    margin: 0px;
-    list-style-type: none;
-    display: flex;
+
+body.unselected nav {
+  font-size: 40px;
+  margin: auto 0px;
 }
-li {
-    margin: 2px;
-    padding: 3px;
-    background-color: rgb(185, 185, 185);
-    border-radius: 5px;
-    cursor: pointer;
+
+body.unselected nav ul {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
 }
-li:hover,li.selected{
-    background-color: rgb(90, 90, 90);
-    color: white;
+
+body.unselected nav ul li {
+  margin: 5px;
+  padding: 20px 40px;
+  text-align: center;
+  border-radius: 10px;
+  background-color: #b8b8b8;
+  cursor: pointer;
 }
-table{
-    width: auto;
+
+body.unselected nav ul li:hover {
+  color: white;
+  background-color: #525252;
 }
-table tbody tr.selected,table#Book tbody tr:hover{
-    background-color: rgb(179, 179, 179);
+
+body.unselected input {
+  display: none;
 }
-.resultArea table{
-    width: 1000px;
+
+body {
+  font-size: 20px;
+  margin: 0px auto;
 }
-input {
-    width: auto;
+
+body nav {
+  margin: auto 0px;
 }
-input[type="radio"]{
-    width: 10px;
+
+body nav ul {
+  padding: 0px;
+  display: flex;
+  justify-content: center;
+  list-style: none;
 }
-td{
-    text-align: center;
+
+body nav ul li {
+  margin: 2px;
+  padding: 3px 10px;
+  text-align: center;
+  border-radius: 3px;
+  background-color: #b8b8b8;
+  cursor: pointer;
 }
-td.submit {
-    text-align: end;
+
+body nav ul li:hover {
+  color: white;
+  background-color: #525252;
 }
-.submit input {
-    width: auto;
+
+body table {
+  margin: 0px auto;
+  border-collapse: collapse;
 }
-tfoot input {
-    width: 140px;
+
+body table tr {
+  text-align: center;
 }
-textarea {
-    width: 90vw;
-    height: 25em;
+
+body table tr th, body table tr td {
+  border: 1px solid black;
 }
-.triangle{
-    position: relative;
-    width: 0;
-    height: 0;
-    top: 20px;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid rgb(0, 0, 0);
+
+body table .triangle {
+  position: relative;
+  width: 0;
+  height: 0;
+  top: 15px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid black;
 }
-.showed .triangle{
-    position: relative;
-    width: 0;
-    height: 0;
-    top: -20px;
-    border-top: 0px;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid rgb(0, 0, 0);
+
+body table .showed .triangle {
+  position: relative;
+  width: 0;
+  height: 0;
+  top: -15px;
+  border-top: 0px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid black;
+}
+
+body table input {
+  height: 100%;
+  width: 98%;
+  max-width: 100px;
 }
